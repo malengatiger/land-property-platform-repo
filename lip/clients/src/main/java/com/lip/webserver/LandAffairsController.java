@@ -99,9 +99,9 @@ public class LandAffairsController {
             CordaX500Name name3 = new CordaX500Name("LipNetworkOperator","Johannesburg","ZA");
             Party bnoParty = proxy.wellKnownPartyFromX500Name(name3);
 
-            logger.info("\uD83C\uDF4F \uD83C\uDF4F .... landAffairs: " + landAffairsParty.getName().toString() + " \uD83E\uDD8B ");
-            logger.info("\uD83C\uDF4F \uD83C\uDF4F .... regulator: " + regulatorParty.getName().toString()  + " \uD83E\uDD8B ");
-            logger.info("\uD83C\uDF4F \uD83C\uDF4F .... networkOperator: " + bnoParty.getName().toString()  + " \uD83E\uDD8B ");
+            logger.info("\uD83C\uDF4F \uD83C\uDF4F ::: landAffairs: " + landAffairsParty.getName().toString() + " \uD83E\uDD8B ");
+            logger.info("\uD83C\uDF4F \uD83C\uDF4F ::: regulator: " + regulatorParty.getName().toString()  + " \uD83E\uDD8B ");
+            logger.info("\uD83C\uDF4F \uD83C\uDF4F ::: networkOperator: " + bnoParty.getName().toString()  + " \uD83E\uDD8B ");
 
             int num = random.nextInt(100);
             List<Coordinates> polygon = new ArrayList<>();
