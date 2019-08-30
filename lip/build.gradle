@@ -2,7 +2,7 @@ buildscript {
     ext {
         corda_release_group = 'net.corda'
         corda_release_version = '4.0'
-        corda_gradle_plugins_version = '4.0.42'
+        corda_gradle_plugins_version = '4.0.45'
         junit_version = '4.12'
         quasar_version = '0.7.10'
         spring_boot_version = '2.0.2.RELEASE'
@@ -12,6 +12,8 @@ buildscript {
         corda_platform_version = '4'
         corbeans_version = '0.26'
         corda_solutions_version = '2.0'
+        tokens_release_version = '1.0'
+        tokens_release_group = 'com.r3.corda.lib.tokens'
     }
 
     repositories {
@@ -20,6 +22,11 @@ buildscript {
         jcenter()
         maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda' }
         maven {url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-solutions-releases' }
+        maven { url 'https://software.r3.com/artifactory/corda' }
+        maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-lib' }
+        maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-lib-dev' }
+
+
     }
 
     dependencies {
@@ -39,6 +46,7 @@ allprojects {
         mavenCentral()
         maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda' }
         maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-solutions-releases' }
+        maven { url 'https://software.r3.com/artifactory/corda' }
         maven { url 'https://jitpack.io' }
     }
 
@@ -109,6 +117,9 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         cordapp project(':workflows')
         cordapp "com.r3.businessnetworks:membership-service:2.0"
         cordapp "com.r3.businessnetworks:membership-service-contracts-and-states:2.0"
+//        cordapp "$tokens_release_group:tokens-contracts:$tokens_release_version"
+//        cordapp "$tokens_release_group:tokens-workflows:$tokens_release_version"
+//        cordapp "$tokens_release_group:tokens-money:$tokens_release_version"
     }
     node {
         name "O=Notary,L=Pretoria,C=ZA"

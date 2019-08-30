@@ -2,12 +2,17 @@ apply plugin: 'net.corda.plugins.cordapp'
 apply plugin: 'net.corda.plugins.cordformation'
 apply plugin: 'net.corda.plugins.quasar-utils'
 
+repositories {
+    maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-lib' }
+    maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-lib-dev' }
+    maven { url 'https://software.r3.com/artifactory/corda' }
+}
 cordapp {
     targetPlatformVersion corda_platform_version.toInteger()
     minimumPlatformVersion corda_platform_version.toInteger()
     workflow {
         name "Template Flows"
-        vendor "Corda Open Source"
+        vendor "AftaRobot"
         licence "Apache License, Version 2.0"
         versionId 1
     }
@@ -44,6 +49,8 @@ dependencies {
     // Corda dependencies.
     cordaCompile "$corda_release_group:corda-core:$corda_release_version"
     cordaRuntime "$corda_release_group:corda:$corda_release_version"
+//    cordaCompile "$tokens_release_group:tokens-workflows:$tokens_release_version"
+//    cordaCompile "$tokens_release_group:tokens-money:$tokens_release_version"
 
     testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
 
@@ -56,6 +63,8 @@ dependencies {
 //    // Optional: control the BNMS dependency versions
     compile "com.r3.businessnetworks:membership-service:$corda_solutions_version"
     compile "com.r3.businessnetworks:membership-service-contracts-and-states:$corda_solutions_version"
+
+
 
 }
 
