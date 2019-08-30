@@ -1,0 +1,173 @@
+buildscript {
+    ext {
+        corda_release_group = 'net.corda'
+        corda_release_version = '4.0'
+        corda_gradle_plugins_version = '4.0.42'
+        junit_version = '4.12'
+        quasar_version = '0.7.10'
+        spring_boot_version = '2.0.2.RELEASE'
+        spring_boot_gradle_plugin_version = '2.0.2.RELEASE'
+        slf4j_version = '1.7.25'
+        log4j_version = '2.11.2'
+        corda_platform_version = '4'
+        corbeans_version = '0.26'
+        corda_solutions_version = '2.0'
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda' }
+        maven {url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-solutions-releases' }
+    }
+
+    dependencies {
+        classpath "net.corda.plugins:cordapp:$corda_gradle_plugins_version"
+        classpath "net.corda.plugins:cordformation:$corda_gradle_plugins_version"
+        classpath "net.corda.plugins:quasar-utils:$corda_gradle_plugins_version"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$spring_boot_gradle_plugin_version"
+    }
+}
+
+allprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenLocal()
+        jcenter()
+        mavenCentral()
+        maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda' }
+        maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-solutions-releases' }
+        maven { url 'https://jitpack.io' }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-parameters" // Required by Corda's serialisation framework.
+    }
+
+    jar {
+        // This makes the JAR's SHA-256 hash repeatable.
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+}
+
+
+apply plugin: 'net.corda.plugins.cordapp'
+apply plugin: 'net.corda.plugins.cordformation'
+apply plugin: 'net.corda.plugins.quasar-utils'
+
+cordapp {
+    info {
+        name "LIP CorDapp"
+        vendor "AftaRobot"
+        targetPlatformVersion corda_platform_version.toInteger()
+        minimumPlatformVersion corda_platform_version.toInteger()
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir rootProject.file("config/dev")
+        }
+    }
+}
+
+dependencies {
+    testCompile "junit:junit:$junit_version"
+
+    // Corda dependencies.
+    cordaCompile "$corda_release_group:corda-core:$corda_release_version"
+    cordaCompile "$corda_release_group:corda-node-api:$corda_release_version"
+    cordaRuntime "$corda_release_group:corda:$corda_release_version"
+
+    // CorDapp dependencies.
+    cordapp project(":workflows")
+    cordapp project(":contracts")
+    cordapp "com.r3.businessnetworks:membership-service:2.0"
+    cordapp "com.r3.businessnetworks:membership-service-contracts-and-states:2.0"
+
+    cordaCompile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
+    cordaCompile "org.apache.logging.log4j:log4j-web:${log4j_version}"
+    cordaCompile "org.slf4j:jul-to-slf4j:$slf4j_version"
+
+
+//    // Optional: control the BNMS dependency versions
+    compile "com.r3.businessnetworks:membership-service:$corda_solutions_version"
+    compile "com.r3.businessnetworks:membership-service-contracts-and-states:$corda_solutions_version"
+
+}
+
+task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
+    nodeDefaults {
+        projectCordapp {
+            deploy = false
+        }
+        cordapp project(':contracts')
+        cordapp project(':workflows')
+        cordapp "com.r3.businessnetworks:membership-service:2.0"
+        cordapp "com.r3.businessnetworks:membership-service-contracts-and-states:2.0"
+    }
+    node {
+        name "O=Notary,L=Pretoria,C=ZA"
+        notary = [validating : false]
+        p2pPort 10021
+        rpcSettings {
+            address("localhost:10022")
+            adminAddress("localhost:10023")
+        }
+    }
+
+    node {
+        name "O=DeptLandAffairs,L=Pretoria,C=ZA"
+        p2pPort 10024
+        rpcSettings {
+            address("localhost:10025")
+            adminAddress("localhost:10026")
+        }
+        rpcUsers = [[ user: "user1", "password": "test", "permissions": ["ALL"]]]
+
+    }
+    node {
+        name "O=Bank,L=Johannesburg,C=GB"
+        p2pPort 10027
+        rpcSettings {
+            address("localhost:10028")
+            adminAddress("localhost:10029")
+        }
+        rpcUsers = [[ user: "user1", "password": "test", "permissions": ["ALL"]]]
+
+    }
+    node {
+        name "O=LipNetworkOperator,L=Johannesburg,C=ZA"
+        p2pPort 10030
+        rpcSettings {
+            address("localhost:10031")
+            adminAddress("localhost:10032")
+        }
+        rpcUsers = [[ user: "user1", "password": "test", "permissions": ["ALL"]]]
+
+    }
+
+    node {
+        name "O=Regulator,L=Johannesburg,C=ZA"
+        p2pPort 10033
+        rpcSettings {
+            address("localhost:10034")
+            adminAddress("localhost:10035")
+        }
+        rpcUsers = [[ user: "user1", "password": "test", "permissions": ["ALL"]]]
+
+    }
+
+
+}
+
+task installQuasar(type: Copy) {
+    destinationDir rootProject.file("lib")
+    from(configurations.quasar) {
+        rename 'quasar-core(.*).jar', 'quasar.jar'
+    }
+}
