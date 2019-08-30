@@ -162,7 +162,6 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
 
     }
 
-
 }
 
 task installQuasar(type: Copy) {

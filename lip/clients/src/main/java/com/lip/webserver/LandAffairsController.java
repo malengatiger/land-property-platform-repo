@@ -79,8 +79,10 @@ public class LandAffairsController {
         StringBuilder sb = new StringBuilder();
         List<StateAndRef<LandState>> list = states.getStates();
         logger.info("\uD83C\uDF3A \uD83C\uDF3A vaultQuery for LandState: found \uD83E\uDD18 " + list.size() + " \uD83E\uDD18");
+        int cnt = 0;
         for (StateAndRef<LandState> info: list) {
-            logger.info("\uD83C\uDF3A \uD83C\uDF3A LandState: name:  \uD83D\uDC9A " + info.getState().getData().getName() + "  \uD83D\uDC9A value: " + info.getState().getData().getOriginalValue());
+            cnt++;
+            logger.info("\uD83C\uDF3A \uD83C\uDF3A LandState #"+cnt+": name:  \uD83D\uDC9A " + info.getState().getData().getName() + "  \uD83D\uDC9A value: " + info.getState().getData().getOriginalValue());
         }
         return GSON.toJson(new PingResult("Number of LandStates: ", "" + list.size()));
     }
@@ -103,7 +105,7 @@ public class LandAffairsController {
 
             int num = random.nextInt(100);
             List<Coordinates> polygon = new ArrayList<>();
-            double amount = num * 900600.23;
+            double amount = num * 9000600.23;
 
             polygon.add(new Coordinates(-25.15525,27.2635));
             polygon.add(new Coordinates(-25.15525,27.2635));
