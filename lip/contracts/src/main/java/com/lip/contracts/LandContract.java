@@ -42,7 +42,7 @@ public class LandContract implements Contract {
             throw new IllegalArgumentException("Only Register command allowed");
         }
         List<PublicKey> requiredSigners = command.getSigners();
-
+        logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 requiredSigners: " + requiredSigners.size());
         ContractState contractState = tx.getOutput(0);
         if (!(contractState instanceof LandState)) {
             throw new IllegalArgumentException("Output state must be LandState");
@@ -53,6 +53,18 @@ public class LandContract implements Contract {
         }
         if (landState.getPolygon().size() < 3) {
             throw new IllegalArgumentException("Polygon requires at least 3 coordinates");
+        }
+        if (landState.getBankParty() == null) {
+            throw new IllegalArgumentException("Bank party required");
+        }
+        if (landState.getBnoParty() == null) {
+            throw new IllegalArgumentException("Network operator party required");
+        }
+        if (landState.getLandAffairsParty() == null) {
+            throw new IllegalArgumentException("LandAffairs party required");
+        }
+        if (landState.getRegulatorParty() == null) {
+            throw new IllegalArgumentException("Regulator party required");
         }
         Party party = landState.getBnoParty();
         PublicKey key = party.getOwningKey();
@@ -69,15 +81,17 @@ public class LandContract implements Contract {
         if (!requiredSigners.contains(key3)) {
             throw new IllegalArgumentException("Regulator Party must sign");
         }
+        Party party4 = landState.getRegulatorParty();
+        PublicKey key4 = party4.getOwningKey();
+        if (!requiredSigners.contains(key4)) {
+            throw new IllegalArgumentException("BANK Party must sign");
+        }
+        if (!landState.getLandAffairsParty().getName().getOrganisation().contains("LandAffairs")) {
+            throw new IllegalArgumentException("LandAffairs Party must drive this bus");
+        }
         logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 LandContract: verification done OK! .....\uD83E\uDD1F \uD83E\uDD1F ");
 
     }
-//
-//    // Used to indicate the transaction's intent.
-//    public interface Commands extends CommandData {
-//        class Action implements Commands {}
-//    }
 
     public static class Register implements CommandData {}
-    public static class MakeOffer implements CommandData {}
 }

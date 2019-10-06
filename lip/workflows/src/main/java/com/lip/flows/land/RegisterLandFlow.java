@@ -23,12 +23,8 @@ import java.util.List;
 public class RegisterLandFlow extends FlowLogic<SignedTransaction> {
     private final static Logger logger = LoggerFactory.getLogger(RegisterLandFlow.class);
 
-    final String name;
-    final Party landAffairsParty, bnoParty, regulatorParty;
-    final List<Coordinates> polygon;
-    final Date dateRegistered;
-    final String description;
-    final double originalValue;
+    final LandState landState;
+
     private final ProgressTracker.Step SENDING_TRANSACTION = new ProgressTracker.Step("Sending transaction to counterParty");
     private final ProgressTracker.Step GENERATING_TRANSACTION = new ProgressTracker.Step("Generating transaction based on new IOU.");
     private final ProgressTracker.Step VERIFYING_TRANSACTION = new ProgressTracker.Step("Verifying contract constraints.");
@@ -64,17 +60,8 @@ public class RegisterLandFlow extends FlowLogic<SignedTransaction> {
         return progressTracker;
     }
 
-    public RegisterLandFlow(String name, Party landAffairsParty, Party bnoParty, Party regulatorParty,
-                            List<Coordinates> polygon, Date dateRegistered, String description,
-                            double originalValue) {
-        this.name = name;
-        this.landAffairsParty = landAffairsParty;
-        this.bnoParty = bnoParty;
-        this.regulatorParty = regulatorParty;
-        this.polygon = polygon;
-        this.dateRegistered = dateRegistered;
-        this.description = description;
-        this.originalValue = originalValue;
+    public RegisterLandFlow(LandState landState) {
+        this.landState = landState;
     }
 
     @Override
@@ -84,20 +71,29 @@ public class RegisterLandFlow extends FlowLogic<SignedTransaction> {
         final ServiceHub serviceHub = getServiceHub();
         logger.info(" \uD83E\uDD1F \uD83E\uDD1F  \uD83E\uDD1F \uD83E\uDD1F  ... RegisterLandFlow call started ...");
         Party notary = serviceHub.getNetworkMapCache().getNotaryIdentities().get(0);
-        LandState landState = new LandState(name,landAffairsParty,bnoParty,regulatorParty,polygon,
-                new Date(),description,originalValue);
+        Party me = serviceHub.getMyInfo().getLegalIdentities().get(0);
+        if (!me.getName().getOrganisation().contains("LandAffairs")) {
+            throw new FlowException("Only the Department of Land Affairs can register land parcels");
+        }
 
         LandContract.Register command = new LandContract.Register();
         logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 Notary: " + notary.getName().toString()
-                + "  \uD83C\uDF4A landAffairsParty: " + landAffairsParty.getName().toString() + " \uD83E\uDDE9 bnoParty: " + bnoParty.getName().toString()
-                + "  \uD83C\uDF4A regulatorParty: "+ regulatorParty.getName().toString() +" \uD83C\uDF4E  name: "
+                + "  \uD83C\uDF4A landAffairsParty: " + landState.getLandAffairsParty().getName().toString()
+                + "  \uD83C\uDF4A bankParty: " + landState.getBankParty().getName().toString()
+                + " \uD83E\uDDE9 bnoParty: " + landState.getBnoParty().getName().toString()
+                + "  \uD83C\uDF4A regulatorParty: "+ landState.getRegulatorParty().getName().toString() +" \uD83C\uDF4E  name: "
                 + landState.getName().concat("  \uD83D\uDC9A originalValue") + landState.getOriginalValue());
 
         progressTracker.setCurrentStep(GENERATING_TRANSACTION);
         TransactionBuilder txBuilder = new TransactionBuilder(notary)
                 .addOutputState(landState, LandContract.ID)
-                .addCommand(command, landAffairsParty.getOwningKey(), regulatorParty.getOwningKey(), bnoParty.getOwningKey());
+                .addCommand(command,
+                        landState.getBankParty().getOwningKey(),
+                        landState.getLandAffairsParty().getOwningKey(),
+                        landState.getRegulatorParty().getOwningKey(),
+                        landState.getBnoParty().getOwningKey());
 
+        logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 TransactionBuilder built ...Org: " + txBuilder.getNotary().getName().getOrganisation());
         progressTracker.setCurrentStep(VERIFYING_TRANSACTION);
         txBuilder.verify(serviceHub);
         logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 Land Register TransactionBuilder verified");
@@ -107,15 +103,26 @@ public class RegisterLandFlow extends FlowLogic<SignedTransaction> {
         logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 Land Register Transaction signInitialTransaction executed ...");
         logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 Transaction signInitialTransaction: ".concat(signedTx.toString()));
 
-        FlowSession investorFlowSession = initiateFlow(regulatorParty);
-        FlowSession customerFlowSession = initiateFlow(landAffairsParty);
+        FlowSession regulatorFlowSession = initiateFlow(landState.getRegulatorParty());
+        FlowSession bnoFlowSession = initiateFlow(landState.getBnoParty());
+        FlowSession bankFlowSession = initiateFlow(landState.getBankParty());
 
         progressTracker.setCurrentStep(GATHERING_SIGS);
         logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 Collecting Signatures ....");
-        SignedTransaction signedTransaction = subFlow(new CollectSignaturesFlow(signedTx, ImmutableList.of(investorFlowSession, customerFlowSession), GATHERING_SIGS.childProgressTracker()));
+        SignedTransaction signedTransaction = subFlow(
+                new CollectSignaturesFlow(signedTx,
+                        ImmutableList.of(regulatorFlowSession, bnoFlowSession, bankFlowSession),
+                        GATHERING_SIGS.childProgressTracker()));
+
         logger.info("\uD83C\uDFBD \uD83C\uDFBD \uD83C\uDFBD \uD83C\uDFBD  Signatures collected OK!  \uD83D\uDE21 \uD83D\uDE21 will call FinalityFlow ... \uD83C\uDF3A \uD83C\uDF3A  \uD83C\uDF3A \uD83C\uDF3A : ".concat(signedTransaction.toString()));
 
-        SignedTransaction mSignedTransactionDone = subFlow(new FinalityFlow(signedTransaction, ImmutableList.of(investorFlowSession, customerFlowSession), FINALISING_TRANSACTION.childProgressTracker()));
+        SignedTransaction mSignedTransactionDone = subFlow(new FinalityFlow(
+                signedTransaction,
+                ImmutableList.of(
+                        regulatorFlowSession,
+                        bnoFlowSession,
+                        bankFlowSession),
+                FINALISING_TRANSACTION.childProgressTracker()));
         logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 FinalityFlow has been executed ... \uD83E\uDD66  are we good? \uD83E\uDD66 ❄️ ❄️ ❄️");
         logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 returning mSignedTransactionDone:  ❄️ ❄️ : ".concat(mSignedTransactionDone.toString()));
         return mSignedTransactionDone;

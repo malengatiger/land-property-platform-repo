@@ -22,18 +22,24 @@ import java.util.List;
 public class LandState implements ContractState {
 
     final String name;
-    final Party landAffairsParty, bnoParty, regulatorParty;
+    final Party landAffairsParty, bnoParty, regulatorParty, bankParty;
     final List<Coordinates> polygon;
+    final List<String> imageURLs;
     final Date dateRegistered;
     final String description;
     final double originalValue;
 
-    public LandState(String name, Party landAffairsParty, Party bnoParty, Party regulatorParty, List<Coordinates> polygon, Date dateRegistered, String description, double originalValue) {
+    public LandState(String name, Party landAffairsParty, Party bnoParty,
+                     Party regulatorParty, Party bankParty,
+                     List<Coordinates> polygon, List<String> imageURLs,
+                     Date dateRegistered, String description, double originalValue) {
         this.name = name;
         this.landAffairsParty = landAffairsParty;
         this.bnoParty = bnoParty;
         this.regulatorParty = regulatorParty;
+        this.bankParty = bankParty;
         this.polygon = polygon;
+        this.imageURLs = imageURLs;
         this.dateRegistered = dateRegistered;
         this.description = description;
         this.originalValue = originalValue;
@@ -41,7 +47,11 @@ public class LandState implements ContractState {
 
     @Override
     public List<AbstractParty> getParticipants() {
-       return ImmutableList.of(bnoParty,landAffairsParty,regulatorParty);
+       return ImmutableList.of(bnoParty,landAffairsParty,regulatorParty, bankParty);
+    }
+
+    public List<String> getImageURLs() {
+        return imageURLs;
     }
 
     public String getName() {
@@ -58,6 +68,10 @@ public class LandState implements ContractState {
 
     public Party getRegulatorParty() {
         return regulatorParty;
+    }
+
+    public Party getBankParty() {
+        return bankParty;
     }
 
     public List<Coordinates> getPolygon() {

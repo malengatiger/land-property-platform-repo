@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "523790990202",
+    "firebase_url": "https://land-platform.firebaseio.com",
+    "project_id": "land-platform",
+    "storage_bucket": "land-platform.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:523790990202:android:c46d2eee0cd51e426e34c3",
+        "android_client_info": {
+          "package_name": "com.land.lip_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "523790990202-i4d8rp8uvh5lcbt7ocjc9vuk4skijfpe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.land.lip_admin",
+            "certificate_hash": "ed02ddd0e7e0820a41307a8872c95032d8f8c897"
+          }
+        },
+        {
+          "client_id": "523790990202-c5hogumh93t1g759ra8papo478ja7iun.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKAD-2Ia5I_uwlWlDup49W_SwnnzS6qJw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "523790990202-c5hogumh93t1g759ra8papo478ja7iun.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
