@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "523790990202",
+    "firebase_url": "https://land-platform.firebaseio.com",
+    "project_id": "land-platform",
+    "storage_bucket": "land-platform.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:523790990202:android:301f7fd8480469a16e34c3",
+        "android_client_info": {
+          "package_name": "com.landprop.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "523790990202-c5hogumh93t1g759ra8papo478ja7iun.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcG_Bwg1hCUDH2cn90iIqLODHGGrTXy3A"
+        },
+        {
+          "current_key": "AIzaSyAKAD-2Ia5I_uwlWlDup49W_SwnnzS6qJw"
+        },
+        {
+          "current_key": "AIzaSyCUcF756zP19ZDN-pTvoc6d_Oooti66e2M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "523790990202-c5hogumh93t1g759ra8papo478ja7iun.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

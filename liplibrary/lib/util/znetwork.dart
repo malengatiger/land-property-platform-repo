@@ -150,12 +150,9 @@ class Net {
     }
   }
 
-  static Future<LandDTO> startLandRegistrationFlow(
-      String name, double originalValue) async {
-    var bag = {
-      "name": name,
-      "originalValue": originalValue,
-    };
+  static Future<LandDTO> startLandRegistrationFlow(LandDTO landDTO) async {
+    var bag = landDTO.toJson();
+
     debugPrint('🍊🍊🍊🍊🍊 startLandRegistrationFlow starting the call ...');
 //    var node = await Prefs.getNode();
     final response = await post(URL + 'land/startLandRegistrationFlow', bag);

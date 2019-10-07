@@ -23,11 +23,11 @@ dependencies:
   flutter_google_places: ^0.2.3
   intl: ^0.16.0
   http: ^0.12.0+2
-  google_maps_flutter: ^0.5.21+6
+  google_maps_flutter: ^0.5.21+7
   google_maps_webservice: ^0.0.15
-  autocomplete_textfield: ^1.6.6
+  autocomplete_textfield: ^1.7.3
   mongodb_mobile: ^0.0.7
-  camera: ^0.5.4+3
+  camera: ^0.5.5+1
   path: ^1.6.4
   video_player: ^0.10.2+1
   cached_network_image: ^1.1.1

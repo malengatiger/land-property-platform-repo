@@ -78,7 +78,11 @@ public class LandAffairsController {
     @GetMapping(value = "/listLandStates", produces = "application/json")
     private List<LandDTO> listLandStates() {
 
-        return WorkerBee.getLandStates(proxy);
+        List<LandDTO> list = WorkerBee.getLandStates(proxy);
+        for (LandDTO m: list) {
+            logger.info("\uD83D\uDD38\uD83D\uDD38\uD83D\uDD38 LAND PARCEL: \uD83D\uDD38\uD83D\uDD38\uD83D\uDD38 " + GSON.toJson(m));
+        }
+        return list;
     }
 
     Random random = new Random(System.currentTimeMillis());

@@ -23,12 +23,15 @@ class LandDTO {
       });
     }
 
-    List listp = data['polygon'];
+    List polygonList = data['polygon'];
     this.polygon = List();
-    if (listp != null) {
-      listp.forEach((a) {
+    if (polygonList != null) {
+      polygonList.forEach((a) {
         print(a);
-        this.polygon.add(CoordinatesDTO(a['latitude'], a['longitude']));
+        this.polygon.add(CoordinatesDTO(
+            latitude: a['latitude'],
+            longitude: a['longitude'],
+            dateTime: a['dateTime']));
       });
     }
     this.name = data['name'];
@@ -49,6 +52,7 @@ class LandDTO {
         p.add(value.toJson());
       }
     }
+    map['polygon'] = p;
 
     return map;
   }

@@ -50,7 +50,7 @@ class ThemeUtil {
   static List<ThemeData> _themes = List();
 
   static int index;
-  static ThemeData getTheme({int themeIndex}) {
+  static ThemeData getTheme(int index, {int themeIndex}) {
     print('🌈 🌈 getting theme with index: 🌈 $index');
     if (_themes.isEmpty) {
       _setThemes();

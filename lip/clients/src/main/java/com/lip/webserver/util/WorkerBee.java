@@ -103,6 +103,7 @@ public class WorkerBee {
         m.setOriginalValue(s.getOriginalValue());
         m.setDescription(s.getDescription());
         m.setImageURLs(s.getImageURLs());
+        m.setDateRegistered(s.getDateRegistered());
         m.setBankParty(new X500Name(
                 s.getBankParty().getName().getOrganisation(),
                 s.getBankParty().getName().getLocality(),
