@@ -1,17 +1,8 @@
 package com.lip.webserver;
 
-import com.lip.flows.land.RegisterLandFlow;
-import com.lip.states.PropertyState;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.r3.businessnetworks.membership.flows.member.RequestMembershipFlow;
-import com.r3.businessnetworks.membership.states.MembershipState;
-import com.r3.businessnetworks.membership.states.MembershipStatus;
-import net.corda.core.contracts.UniqueIdentifier;
-import net.corda.core.identity.CordaX500Name;
-import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
-import net.corda.core.messaging.FlowHandle;
 import net.corda.core.node.NodeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Define your API endpoints here.

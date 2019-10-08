@@ -26,7 +26,6 @@ public class LandContract implements Contract {
     // does not throw an exception.
     @Override
     public void verify(LedgerTransaction tx) throws IllegalArgumentException{
-
         logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 LandContract: verify starting ..... \uD83E\uDD6C \uD83E\uDD6C ");
         if (tx.getInputStates().size() != 0) {
             throw new IllegalArgumentException("Input states must be zero");

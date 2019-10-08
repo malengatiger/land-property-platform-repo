@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:liplibrary/data/land.dart';
+import 'package:liplibrary/util/znetwork.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -9,6 +13,23 @@ Bloc bloc = Bloc();
 class Bloc {
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseUser _user;
+
+  StreamController<List<LandDTO>> _landController =
+      StreamController.broadcast();
+  Stream get landStream => _landController.stream;
+  void closeStreams() {
+    _landController.close();
+  }
+
+  Future<List<LandDTO>> getLandStates() async {
+    var list = await Net.getLandList();
+    if (list.isEmpty) {
+      list = await Net.getFirestoreParcels();
+    }
+    _landController.sink.add(list);
+    return list;
+  }
+
   Future<FirebaseUser> signIn(String email, String password) async {
     var result =
         await auth.signInWithEmailAndPassword(email: email, password: password);

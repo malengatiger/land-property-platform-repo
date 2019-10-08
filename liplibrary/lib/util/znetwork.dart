@@ -23,55 +23,6 @@ class Net {
     return url;
   }
 
-//  static Future<List<NodeInfo>> listNodes() async {
-//    var list = List<NodeInfo>();
-//    var result = await auth.currentUser();
-//    if (result == null) {
-//      var email = DotEnv().env['email'];
-//      var pass = DotEnv().env['password'];
-//      print('🌸 🌸 🌸 🌸 🌸 email from .env : 🌸  $email 🌸  pass: $pass');
-//      var userResult =
-//          await auth.signInWithEmailAndPassword(email: email, password: pass);
-//      print(
-//          '🍊 🍊 🍊 Logged into Firebase with .env credentials,  🌸 uid: ${userResult.user.uid} ... getting nodes ...');
-//      list = await _getNodes(list);
-//      await auth.signOut();
-//      print('🍊 🍊 🍊 Logged OUT of Firebase  ${userResult.user.uid} ... ');
-//    } else {
-//      list = await _getNodes(list);
-//    }
-//    if (list.isNotEmpty) {
-//      await Prefs.saveNodes(list);
-//    }
-//    return list;
-//  }
-
-//  static Future<String> getNodeUrl() async {
-//    var m = await _getCachedURL();
-//    if (m != null) {
-//      return m;
-//    }
-//    var acct = await Prefs.getAccount();
-//    if (acct == null) {
-//      throw Exception("Account not available yet");
-//    }
-//    var list = await listNodes();
-//    String url;
-//    print('  🔆  🔆  🔆 local account:  💚 ${acct.toJson()}');
-//    list.forEach((node) {
-//      var host = node.addresses.elementAt(0);
-//      print('  🔆  🔆  🔆 host of node:  💚 $host');
-//      if (host == acct.host) {
-//        url = node.webAPIUrl;
-//      }
-//    });
-//    if (url == null) {
-//      throw Exception("Url not found");
-//    }
-//    Prefs.setUrl(url);
-//    return url;
-//  }
-
   static Future getUser(String email) async {
     String url = await _getCachedURL();
 
@@ -172,13 +123,14 @@ class Net {
   }
 
   static Future<List<LandDTO>> getFirestoreParcels() async {
+    print('🥬  🥬 getFirestoreParcels ...');
     List<LandDTO> list = List();
     QuerySnapshot res = await db.collection('landParcels').getDocuments();
     res.documents.forEach((doc) {
       var m = LandDTO.fromJson(doc.data);
       list.add(m);
     });
-
+    print('🥬  🥬 getFirestoreParcels ... found: ${list.length}');
     return list;
   }
 

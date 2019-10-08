@@ -27,7 +27,6 @@ class LandDTO {
     this.polygon = List();
     if (polygonList != null) {
       polygonList.forEach((a) {
-        print(a);
         this.polygon.add(CoordinatesDTO(
             latitude: a['latitude'],
             longitude: a['longitude'],
