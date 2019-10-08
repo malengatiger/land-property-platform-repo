@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:liplibrary/data/land.dart';
 import 'package:liplibrary/util/functions.dart';
 import 'package:liplibrary/util/slide_right.dart';
+import 'package:liplibrary/util/theme_bloc.dart';
 import 'package:liplibrary/util/znetwork.dart';
 
 import 'land_editor.dart';
@@ -42,10 +43,20 @@ class _LandListState extends State<LandList> {
       key: _key,
       appBar: AppBar(
         title: Text('Land Parcels List'),
+        leading: IconButton(
+          icon: Icon(Icons.apps),
+          onPressed: () {
+            themeBloc.changeToRandomTheme();
+          },
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
             onPressed: _startLandEditor,
+          ),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: _getLandStates,
           ),
         ],
         bottom: PreferredSize(

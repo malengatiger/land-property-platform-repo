@@ -34,9 +34,8 @@ class ThemeBloc {
 
   changeToRandomTheme() {
     _themeIndex = _rand.nextInt(ThemeUtil.getThemeCount() - 1);
-    _themeController.sink.add(_themeIndex);
-    print('✈️✈️ changeToRandomTheme: adding index to stream ....');
     Prefs.setThemeIndex(_themeIndex);
+    _themeController.sink.add(_themeIndex);
   }
 
   closeStream() {

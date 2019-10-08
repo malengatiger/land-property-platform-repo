@@ -64,17 +64,20 @@ class _MapEditorState extends State<MapEditor> {
             onPressed: _confirmRemovePolygons,
           ),
           IconButton(
-            icon: Icon(Icons.create_new_folder),
-            onPressed: _drawPolygon,
+            icon: Icon(Icons.add),
+            onPressed: _addCurrentPoint,
           ),
         ],
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(60),
           child: Column(
             children: <Widget>[
-              Text(
-                '${widget.land.name}',
-                style: Styles.blackBoldMedium,
+              GestureDetector(
+                onTap: _animate,
+                child: Text(
+                  '${widget.land.name}',
+                  style: Styles.blackBoldMedium,
+                ),
               ),
               SizedBox(
                 height: 20,
@@ -198,7 +201,7 @@ class _MapEditorState extends State<MapEditor> {
             ));
   }
 
-  _addPointToPolygon() async {
+  void _addPointToPolygon() async {
     print('🔸🔸🔸 _addPointToPolygon: $latLng');
     Navigator.pop(context);
 
@@ -277,9 +280,12 @@ class _MapEditorState extends State<MapEditor> {
               }));
       _markersForMap.add(marker);
     });
+  }
+
+  void _animate() {
+    var centre = computeCentroid();
     if (_mapController != null) {
-      _mapController.animateCamera(CameraUpdate.newLatLngZoom(
-          points[widget.land.polygon.length - 1], 12));
+      _mapController.animateCamera(CameraUpdate.newLatLngZoom(centre, 12));
       setState(() {});
     }
   }
@@ -307,7 +313,7 @@ class _MapEditorState extends State<MapEditor> {
 //  List<LatLng> points = List();
   Set<Polygon> polygons = Set();
 
-  _drawPolygon() {
+  void _drawPolygon() {
     if (widget.land.polygon.isEmpty) {
       debugPrint('🏮 🏮 _drawPolygon: NO POINTS TO DRAW 🏮 🏮 ');
       return;
@@ -465,5 +471,27 @@ class _MapEditorState extends State<MapEditor> {
       AppSnackbar.showErrorSnackbar(
           scaffoldKey: _key, message: e.message, actionLabel: 'Err');
     }
+  }
+
+  void _addCurrentPoint() async {
+    print('🧩 🧩 🧩 adding current location as polygon point  🧩 🧩 🧩');
+    var loc = await bloc.getCurrentLocation();
+    print(loc);
+    latLng = LatLng(loc.coordinates[1], loc.coordinates[0]);
+    print(latLng);
+    _onMapLongPressed(latLng);
+  }
+
+  LatLng computeCentroid() {
+    double latitude = 0;
+    double longitude = 0;
+    int n = widget.land.polygon.length;
+
+    for (var point in widget.land.polygon) {
+      latitude += point.latitude;
+      longitude += point.longitude;
+    }
+
+    return new LatLng(latitude / n, longitude / n);
   }
 }

@@ -30,7 +30,6 @@ class _LandEditorState extends State<LandEditor> {
     return Scaffold(
       key: _key,
       appBar: AppBar(
-        leading: Icon(Icons.people),
         title: Text('Land Editor'),
         bottom: PreferredSize(
             child: Column(
@@ -62,13 +61,16 @@ class _LandEditorState extends State<LandEditor> {
                     key: _formKey,
                     child: Column(
                       children: <Widget>[
+                        SizedBox(
+                          height: 28,
+                        ),
                         Text(
                           "Land Parcel Details",
                           style: TextStyle(
                               fontSize: 28, fontWeight: FontWeight.w900),
                         ),
                         SizedBox(
-                          height: 8,
+                          height: 24,
                         ),
                         TextFormField(
                           key: _nameKey,
@@ -103,7 +105,7 @@ class _LandEditorState extends State<LandEditor> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 60),
                         RaisedButton(
                           color: Colors.indigo,
                           elevation: 8,
@@ -115,7 +117,8 @@ class _LandEditorState extends State<LandEditor> {
                             ),
                           ),
                           onPressed: _confirm,
-                        )
+                        ),
+                        SizedBox(height: 40),
                       ],
                     ),
                   ),

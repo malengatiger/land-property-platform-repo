@@ -153,12 +153,44 @@ class Net {
   static Future<LandDTO> startLandRegistrationFlow(LandDTO landDTO) async {
     var bag = landDTO.toJson();
 
-    debugPrint('🍊🍊🍊🍊🍊 startLandRegistrationFlow starting the call ...');
-//    var node = await Prefs.getNode();
+    debugPrint(
+        '🍊 🍊 🍊 🍊 🍊 startLandRegistrationFlow starting the call ...');
     final response = await post(URL + 'land/startLandRegistrationFlow', bag);
     var m = json.decode(response);
     var land = LandDTO.fromJson(m);
+    try {
+      await addLandToFirestore(land);
+    } catch (e) {
+      print(' 🔆🔆🔆🔆 Firestore call failed. we might not be online');
+    }
     return land;
+  }
+
+  static Future addLandToFirestore(LandDTO land) async {
+    var ref = await db.collection('landParcels').add(land.toJson());
+    print('🥬  🥬 land parcel has been cached to Firestore: ${ref.path}');
+  }
+
+  static Future<List<LandDTO>> getFirestoreParcels() async {
+    List<LandDTO> list = List();
+    QuerySnapshot res = await db.collection('landParcels').getDocuments();
+    res.documents.forEach((doc) {
+      var m = LandDTO.fromJson(doc.data);
+      list.add(m);
+    });
+
+    return list;
+  }
+
+  static Future<List<LandDTO>> restore() async {
+    List<LandDTO> list = await getFirestoreParcels();
+    List<LandDTO> list2 = List();
+    for (var x in list) {
+      var d = await startLandRegistrationFlow(x);
+      list2.add(d);
+      print('🔵 🔵 🔵 Land restored: 🔵 🔵 🔵  ${d.toJson()}');
+    }
+    return list2;
   }
 
   static Future<List<AccountInfo>> getAccounts() async {
