@@ -138,6 +138,7 @@ class _LandEditorState extends State<LandEditor> {
         polygon: List(),
         imageURLs: List(),
       );
+      Navigator.pop(context);
       Navigator.push(
           context,
           SlideRightRoute(

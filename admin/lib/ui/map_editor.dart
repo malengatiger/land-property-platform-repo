@@ -459,6 +459,7 @@ class _MapEditorState extends State<MapEditor> {
       LandDTO result = await Net.startLandRegistrationFlow(widget.land);
       print('🧡 💛 💚 💙 💜 ${result.toJson()}');
       _key.currentState.removeCurrentSnackBar();
+      Navigator.pop(context);
       Navigator.push(
           context,
           SlideRightRoute(
