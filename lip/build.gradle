@@ -126,8 +126,8 @@ dependencies {
     cordaCompile "$accounts_release_group:accounts-flows:$accounts_release_version"
 
     // CorDapp dependencies.
-//    cordapp "$corda_release_group:corda-finance-contracts:$corda_release_version"
-//    cordapp "$corda_release_group:corda-finance-workflows:$corda_release_version"
+    cordapp "$corda_release_group:corda-finance-contracts:$corda_release_version"
+    cordapp "$corda_release_group:corda-finance-workflows:$corda_release_version"
     cordapp "$corda_release_group:corda-confidential-identities:$corda_release_version"
 
     // Logging
@@ -152,53 +152,55 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
         cordapp("$accounts_release_group:accounts-contracts:$accounts_release_version")
         cordapp("$accounts_release_group:accounts-flows:$accounts_release_version")
 
+        cordapp("$corda_release_group:corda-finance-contracts:$corda_release_version")
+        cordapp("$corda_release_group:corda-finance-workflows:$corda_release_version")
         cordapp("$corda_release_group:corda-confidential-identities:$corda_release_version")
 
         rpcUsers = [[ user: "user1", "password": "test", "permissions": ["ALL"]]]    }
     node {
         name "O=Notary,L=Pretoria,C=ZA"
         notary = [validating : false]
-        p2pPort 10021
+        p2pPort 10521
         rpcSettings {
-            address("localhost:10022")
-            adminAddress("localhost:10023")
+            address("localhost:10522")
+            adminAddress("localhost:10523")
         }
     }
 
     node {
         name "O=DeptLandAffairs,L=Pretoria,C=ZA"
-        p2pPort 10024
+        p2pPort 10503
         rpcSettings {
-            address("localhost:10025")
-            adminAddress("localhost:10026")
+            address("localhost:10525")
+            adminAddress("localhost:10526")
         }
 
     }
     node {
         name "O=Bank,L=Johannesburg,C=ZA"
-        p2pPort 10027
+        p2pPort 10527
         rpcSettings {
-            address("localhost:10028")
-            adminAddress("localhost:10029")
+            address("localhost:10528")
+            adminAddress("localhost:10529")
         }
 
     }
     node {
         name "O=LipNetworkOperator,L=Johannesburg,C=ZA"
-        p2pPort 10030
+        p2pPort 10530
         rpcSettings {
-            address("localhost:10031")
-            adminAddress("localhost:10032")
+            address("localhost:10531")
+            adminAddress("localhost:10532")
         }
 
     }
 
     node {
         name "O=Regulator,L=Johannesburg,C=ZA"
-        p2pPort 10033
+        p2pPort 10534
         rpcSettings {
-            address("localhost:10034")
-            adminAddress("localhost:10035")
+            address("localhost:10535")
+            adminAddress("localhost:10536")
         }
 
     }

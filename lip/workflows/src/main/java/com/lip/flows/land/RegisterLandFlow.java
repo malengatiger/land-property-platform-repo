@@ -2,11 +2,11 @@ package com.lip.flows.land;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.lip.contracts.LandContract;
-import com.lip.states.Coordinates;
+import com.lip.flows.regulator.ReportToRegulatorFlow;
+import com.lip.flows.tokens.CreateLandTokenTypeFlow;
 import com.lip.states.LandState;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.flows.*;
-import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
 import net.corda.core.node.ServiceHub;
 import net.corda.core.transactions.SignedTransaction;
@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @InitiatingFlow
 @StartableByRPC
@@ -82,7 +82,7 @@ public class RegisterLandFlow extends FlowLogic<SignedTransaction> {
                 + "  \uD83C\uDF4A bankParty: " + landState.getBankParty().getName().toString()
                 + " \uD83E\uDDE9 bnoParty: " + landState.getBnoParty().getName().toString()
                 + "  \uD83C\uDF4A regulatorParty: "+ landState.getRegulatorParty().getName().toString() +" \uD83C\uDF4E  name: "
-                + landState.getName().concat("  \uD83D\uDC9A originalValue") + landState.getOriginalValue());
+                + landState.getName().concat("  \uD83D\uDC9A originalValue") + landState.getValue());
 
         progressTracker.setCurrentStep(GENERATING_TRANSACTION);
         TransactionBuilder txBuilder = new TransactionBuilder(notary)
@@ -125,6 +125,25 @@ public class RegisterLandFlow extends FlowLogic<SignedTransaction> {
                 FINALISING_TRANSACTION.childProgressTracker()));
         logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 FinalityFlow has been executed ... \uD83E\uDD66  are we good? \uD83E\uDD66 ❄️ ❄️ ❄️");
         logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 returning mSignedTransactionDone:  ❄️ ❄️ : ".concat(mSignedTransactionDone.toString()));
-        return mSignedTransactionDone;
+
+        SignedTransaction tx = subFlow(new CreateLandTokenTypeFlow(
+                landState,"First creation: ".concat(new Date().toString())));
+        reportToRegulator(serviceHub,tx);
+        return tx;
+    }
+
+    @Suspendable
+    private void reportToRegulator(ServiceHub serviceHub, SignedTransaction mSignedTransactionDone) throws FlowException {
+        logger.info("\uD83D\uDCCC \uD83D\uDCCC \uD83D\uDCCC  Talking to the Regulator, for compliance, Senor! .............");
+        Set<Party> parties = serviceHub.getIdentityService().partiesFromName("Regulator",false);
+        Party regulator = parties.iterator().next();
+        try {
+            subFlow(new ReportToRegulatorFlow(regulator,mSignedTransactionDone));
+            logger.info("\uD83D\uDCCC \uD83D\uDCCC \uD83D\uDCCC  DONE talking to the Regulator, Phew!");
+
+        } catch (Exception e) {
+            logger.error(" \uD83D\uDC7F  \uD83D\uDC7F  \uD83D\uDC7F Regulator fell down.  \uD83D\uDC7F IGNORED  \uD83D\uDC7F ", e);
+            throw new FlowException("Regulator fell down!");
+        }
     }
 }

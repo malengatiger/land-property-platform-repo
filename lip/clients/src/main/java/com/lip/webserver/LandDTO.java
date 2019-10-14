@@ -12,15 +12,14 @@ public class LandDTO {
     private List<CoordinatesDTO> polygon;
     private List<String> imageURLs;
     private Date dateRegistered;
-    private String description;
-    private double originalValue;
+    private String description, identifier;
+    private double value;
 
     public LandDTO(String name, X500Name landAffairsParty,
                    X500Name bnoParty, X500Name regulatorParty,
                    X500Name bankParty, List<CoordinatesDTO> polygon,
                    List<String> imageURLs, Date dateRegistered,
-                   String description, double originalValue) {
-
+                   String description, String identifier, double value) {
         this.name = name;
         this.landAffairsParty = landAffairsParty;
         this.bnoParty = bnoParty;
@@ -30,7 +29,12 @@ public class LandDTO {
         this.imageURLs = imageURLs;
         this.dateRegistered = dateRegistered;
         this.description = description;
-        this.originalValue = originalValue;
+        this.identifier = identifier;
+        this.value = value;
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 
     public X500Name getBankParty() {
@@ -108,11 +112,11 @@ public class LandDTO {
         this.description = description;
     }
 
-    public double getOriginalValue() {
-        return originalValue;
+    public double getValue() {
+        return value;
     }
 
-    public void setOriginalValue(double originalValue) {
-        this.originalValue = originalValue;
+    public void setValue(double value) {
+        this.value = value;
     }
 }

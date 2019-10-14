@@ -2,6 +2,9 @@ package com.lip.webserver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.lip.webserver.data.LIPAccountDTO;
+import com.lip.webserver.util.DemoUtil;
+import com.lip.webserver.util.WorkerBee;
 import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.node.NodeInfo;
@@ -9,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -82,6 +86,45 @@ public class AdminController {
 
         logger.info("🥬 🥬 🥬 🥬 Total Registered Flows  \uD83C\uDF4E  " + cnt + "  \uD83C\uDF4E \uD83E\uDD6C ");
         return flows;
+    }
+
+    @GetMapping(value = "/addAccount", produces = "application/json")
+    private LIPAccountDTO addAccount(
+            @RequestParam String name,
+            @RequestParam String email,
+            @RequestParam String cellphone,
+            @RequestParam String password) throws Exception {
+
+        logger.info("🥬 🥬 🥬 🥬 Register new LIP account ...  \uD83E\uDD6C ");
+        LIPAccountDTO m = WorkerBee.addAccount(proxy,name, email,password,cellphone);
+        //todo - remove this
+        getAccounts();
+        return m;
+    }
+    @GetMapping(value = "/getAccounts", produces = "application/json")
+    private List<LIPAccountDTO> getAccounts() throws Exception {
+
+        logger.info("🥬 🥬 🥬 🥬 get LIP accounts ...  \uD83E\uDD6C ");
+        return WorkerBee.getLIPAccounts(proxy);
+    }
+    @GetMapping(value = "/getAccountInfos", produces = "application/json")
+    private List<String> getAccountInfos() throws Exception {
+
+        logger.info("🥬 🥬 🥬 🥬 get accountInfos ...  \uD83E\uDD6C ");
+        return WorkerBee.getAccountInfos(proxy);
+    }
+
+    @GetMapping(value = "/getAllStates", produces = "application/json")
+    private List<String> getAllStates() throws Exception {
+
+        logger.info("🥬 🥬 🥬 🥬  getAllStates ...  \uD83E\uDD6C ");
+        return WorkerBee.getAllStates(proxy);
+    }
+    @GetMapping(value = "/demo", produces = "application/json")
+    private String startDemoData() throws Exception {
+
+        logger.info("🥬 🥬 🥬 🥬  startDemoData ...  \uD83E\uDD6C ");
+        return DemoUtil.startDemoData(proxy);
     }
 
 

@@ -37,30 +37,35 @@ dependencies {
     task runTemplateClient(type: JavaExec, dependsOn: assemble) {
         classpath = sourceSets.main.runtimeClasspath
         main = 'com.lip.Client'
-        args 'localhost:10090', 'user1', 'test'
+        systemProperty 'spring.profiles.active', profile
+        args 'localhost:10590', 'user1', 'test'
     }
-
+    task runLandAffairs(type: JavaExec, dependsOn: assemble) {
+        classpath = sourceSets.main.runtimeClasspath
+        main = 'com.lip.webserver.LIPWebApi'
+        systemProperty 'spring.profiles.active', profile
+        args '--server.port=10595', '--config.rpc.host=localhost', '--config.rpc.port=10525', '--config.rpc.username=user1', '--config.rpc.password=test'
+    }
     task runBank(type: JavaExec, dependsOn: assemble) {
         classpath = sourceSets.main.runtimeClasspath
         main = 'com.lip.webserver.LIPWebApi'
-        args '--server.port=10091', '--config.rpc.host=localhost', '--config.rpc.port=10028', '--config.rpc.username=user1', '--config.rpc.password=test'
+        systemProperty 'spring.profiles.active', profile
+        args '--server.port=10591', '--config.rpc.host=localhost', '--config.rpc.port=10528', '--config.rpc.username=user1', '--config.rpc.password=test'
     }
     task runNetworkOperator(type: JavaExec, dependsOn: assemble) {
         classpath = sourceSets.main.runtimeClasspath
         main = 'com.lip.webserver.LIPWebApi'
-        args '--server.port=10093', '--config.rpc.host=localhost', '--config.rpc.port=10031', '--config.rpc.username=user1', '--config.rpc.password=test'
+        systemProperty 'spring.profiles.active', profile
+        args '--server.port=10593', '--config.rpc.host=localhost', '--config.rpc.port=10531', '--config.rpc.username=user1', '--config.rpc.password=test'
     }
 
-    task runLandAffairs(type: JavaExec, dependsOn: assemble) {
-        classpath = sourceSets.main.runtimeClasspath
-        main = 'com.lip.webserver.LIPWebApi'
-        args '--server.port=10095', '--config.rpc.host=localhost', '--config.rpc.port=10025', '--config.rpc.username=user1', '--config.rpc.password=test'
-    }
+
 
     task runRegulator(type: JavaExec, dependsOn: assemble) {
         classpath = sourceSets.main.runtimeClasspath
         main = 'com.lip.webserver.LIPWebApi'
-        args '--server.port=10097', '--config.rpc.host=localhost', '--config.rpc.port=10034', '--config.rpc.username=user1', '--config.rpc.password=test'
+        systemProperty 'spring.profiles.active', profile
+        args '--server.port=10597', '--config.rpc.host=localhost', '--config.rpc.port=10535', '--config.rpc.username=user1', '--config.rpc.password=test'
     }
 
 
