@@ -1,8 +1,8 @@
 package com.lip.webserver.util;
 
-import com.lip.states.LandToken;
 import com.lip.webserver.LandDTO;
 import com.lip.webserver.data.LIPAccountDTO;
+import com.lip.webserver.data.LandTokenDTO;
 import net.corda.core.messaging.CordaRPCOps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,19 +11,30 @@ import java.util.*;
 
 public class DemoUtil {
     private final static Logger logger = LoggerFactory.getLogger(DemoUtil.class);
+    private static final int NUMBER_OF_ACCOUNTS = 25, NUMBER_OF_TOKEN_HOLDERS = 5;
 
-    public static String startDemoData(CordaRPCOps proxy) throws Exception {
+    public static String startDemoData(CordaRPCOps proxy, boolean recreateLandParcels) throws Exception {
 
-        logger.info("\n\nDemoUtil starting, cleaning up Firebase ...");
+        logger.info("\n\n\uD83D\uDC24 \uD83D\uDC24 \uD83D\uDC24 DemoUtil starting, cleaning up Firebase ...");
         FirebaseUtil.deleteUsers();
         FirebaseUtil.deleteCollection("accounts");
+        FirebaseUtil.deleteCollection("tokenTypes");
 
-        logger.info("\nDemoUtil generating accounts  ...");
+        if (recreateLandParcels)
+            recreateLandParcelsOnCorda(proxy);
+
+        logger.info("\nDemoUtil generating accounts  \uD83D\uDCA7 \uD83D\uDCA7 \uD83D\uDCA7...");
+        HashMap<String, String> names = new HashMap<>();
+        for (int i = 0; i < NUMBER_OF_ACCOUNTS; i++) {
+            String name = getRandomName();
+            names.put(name, name);
+        }
+        logger.info("randomized \uD83D\uDD06 \uD83D\uDD06 " + names.size() + " names for accounts");
         int cnt = 0;
-        for (int i = 0; i < 30; i++) {
+        for (String name : names.values()) {
             try {
                 WorkerBee.addAccount(proxy,
-                        getRandomName(),
+                        name,
                         getEmail(),
                         "pass123",
                         getPhone());
@@ -33,34 +44,49 @@ public class DemoUtil {
                 logger.error(e.getMessage());
             }
         }
+
         logger.info("\uD83D\uDD06 \uD83D\uDD06 DemoUtil done generating accounts; generated: " +
-                "\uD83C\uDF45 " + cnt + " \uD83C\uDF45 ");
-        String m = issueTokens(proxy);
+                "\uD83C\uDF45 " + cnt + " accounts \uD83C\uDF45 will start token issue ...");
+
+//        String m = issueTokens(proxy);
         String msg = "\n\n\uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 " +
-                "Demo Data generation COMPLETE!\n".concat(m);
+                "Demo Data generation COMPLETE!\n";
         return msg;
     }
 
-    private static String issueTokens(CordaRPCOps proxy) throws Exception {
+    private static void recreateLandParcelsOnCorda(CordaRPCOps proxy) throws Exception {
+        List<LandDTO> list = FirebaseUtil.getLandParcels();
+        int cnt = 0;
+        for (LandDTO m : list) {
+            WorkerBee.addLand(proxy, m, false);
+            cnt++;
+        }
+        logger.info("\n\uD83C\uDF38 \uD83C\uDF38 Land Parcels recreated: " +
+                "\uD83E\uDD66 " + cnt + " \uD83E\uDD66 ");
+    }
+
+    public static String distributeTokens(CordaRPCOps proxy) throws Exception {
+        logger.info("\n\n\uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35" +
+                "Start issuing tokens for land parcels ...");
         List<LIPAccountDTO> lipAccounts = FirebaseUtil.getAccounts();
         List<LandDTO> lands = FirebaseUtil.getLandParcels();
 
         for (LandDTO land : lands) {
-            int numberOfHolders = random.nextInt(5);
+            int numberOfHolders = random.nextInt(NUMBER_OF_TOKEN_HOLDERS);
             if (numberOfHolders == 0) numberOfHolders = 1;
             logger.info(" \uD83C\uDF1E \uD83C\uDF1E ".concat(land.getName())
                     .concat(" to be split among \uD83C\uDF1E " + numberOfHolders) + " \uD83C\uDF1E "
-            .concat(" tokens: " + land.getValue()));
-            splitTokens(proxy, land, numberOfHolders, lipAccounts);
+                    .concat(" tokens: " + land.getValue()));
+            splitTokensAmongAccounts(proxy, land, numberOfHolders, lipAccounts);
         }
         String msg = "\uD83D\uDC4C\uD83C\uDFFD \uD83D\uDC4C\uD83C\uDFFD Tokens issued to all accounts selected";
         logger.info(msg);
         return msg;
     }
 
-    private static void splitTokens(CordaRPCOps proxy, LandDTO land,
-                                    int numberOfHolders,
-                                    List<LIPAccountDTO> lipAccounts) throws Exception {
+    private static void splitTokensAmongAccounts(CordaRPCOps proxy, LandDTO land,
+                                                 int numberOfHolders,
+                                                 List<LIPAccountDTO> lipAccounts) throws Exception {
         HashMap<String, LIPAccountDTO> map = new HashMap<>();
 
         while (map.size() < numberOfHolders) {
@@ -70,25 +96,33 @@ public class DemoUtil {
                 map.put(dto.getIdentifier(), dto);
             }
         }
-        LandToken token = WorkerBee.createLandTokenType(proxy, land.getName(), land.getIdentifier());
+        logger.info("\uD83E\uDDE9 splitTokensAmongAccounts \uD83E\uDDE9 \uD83E\uDDE9 \uD83E\uDDE9 \uD83E\uDDE9 " + map.size());
+        LandTokenDTO token = FirebaseUtil.getTokenByName(land.getName());
         logger.info("\uD83E\uDDA0 \uD83E\uDDA0 LandToken created. YEBO! \uD83E\uDDA0 "
                 .concat(token.getDescription()));
-        FirebaseUtil.addToken(token);
         Collection<LIPAccountDTO> list = map.values();
-        long eachSplit = (long) (land.getValue() / numberOfHolders);
+        long eachSplit = land.getValue() / numberOfHolders;
         for (LIPAccountDTO accountDTO : list) {
             grantTokensToAccount(proxy, accountDTO, eachSplit, token, land);
         }
 
     }
 
-    private static void grantTokensToAccount(CordaRPCOps proxy, LIPAccountDTO account,
-                                             long amount, LandToken landToken, LandDTO land) throws Exception {
+    private static void grantTokensToAccount(CordaRPCOps proxy,
+                                             LIPAccountDTO account,
+                                             long amount,
+                                             LandTokenDTO landToken,
+                                             LandDTO land) throws Exception {
+
+        logger.info("\uD83D\uDC4C\uD83C\uDFFD \uD83D\uDC4C\uD83C\uDFFD grantTokensToAccount: "
+                .concat("\uD83C\uDF4E " + amount).concat(" \uD83C\uDF4E per holder"));
+
         WorkerBee.issueTokens(proxy, amount, account.getIdentifier(),
-                landToken.getLinearId().getId().toString(), land.getIdentifier());
+                landToken.getLinearId(), land.getIdentifier());
+
         logger.info("\uD83D\uDC4C\uD83C\uDFFD \uD83D\uDC4C\uD83C\uDFFD " + amount + " tokens issued to: ".concat(account.getName())
                 .concat(" for land: \uD83C\uDF45 ".concat(land.getName())
-                .concat(" \uD83C\uDF45 ")));
+                        .concat(" \uD83C\uDF45 ")));
     }
 
     private static String getEmail() {
@@ -207,10 +241,45 @@ public class DemoUtil {
         names.add("Forensic Labs Ltd");
         names.add("DLT TechStars Inc");
         names.add("CordaBrokers Pty Ltd");
+        names.add("Cordarell Farms");
+        names.add("Johan van Niekerk");
+        names.add("Pieter van Niekerk");
+        names.add("Hessie van Niekerk");
+        names.add("Johan Terblanche");
+        names.add("Johan van Rensburg");
+        names.add("Dan Durant");
+        names.add("Johan Boshoff");
+        names.add("Poppie Boshoff");
+        names.add("Ruan Boshoff");
+        names.add("Pieter Boshoff");
+        names.add("Johan Ferreira");
+        names.add("Johan Pieter Ferreira");
+        names.add("Salome Ferreira");
+        names.add("Johan Smit");
+        names.add("Daniel Smit");
+        names.add("Susanna Smit");
+        names.add("Ruan Smit");
+        names.add("Johan Frank Smit");
+        names.add("Ronald Smit");
+        names.add("John Makhubela");
+        names.add("Peter K. Makhubela");
+        names.add("Ntombi Makhubela");
+        names.add("John Maringa");
+        names.add("Bafana Maringa");
+        names.add("Thabo Maringa");
+        names.add("Dithebe Maringa");
+        names.add("John Dlamini");
+        names.add("Papi Dlamini");
+        names.add("Ronald Dlamini");
+        names.add("Thabiso Dlamini");
+        names.add("David Dlamini");
+
 
         String name = names.get(random.nextInt(names.size() - 1));
         if (map.containsKey(name)) {
-            throw new Exception("Random name collision");
+            String msg = "Random name collision";
+            logger.warn(msg.concat(" - ").concat(name));
+            getRandomName();
         } else {
             map.put(name, name);
         }

@@ -18,13 +18,13 @@ public class RegisterLandFlowResponder extends FlowLogic<SignedTransaction> {
 
     public RegisterLandFlowResponder(FlowSession counterPartySession) {
         this.counterPartySession = counterPartySession;
-        logger.info("AddInvoiceFlowResponder Constructor fired: \uD83C\uDF45 \uD83C\uDF45 \uD83C\uDF45");
+        logger.info("RegisterLandFlowResponder Constructor fired: \uD83C\uDF45 \uD83C\uDF45 \uD83C\uDF45");
     }
 
     @Override
     @Suspendable
     public SignedTransaction call() throws FlowException {
-        logger.info("\uD83E\uDD6C \uD83E\uDD6C Responder call method at " + new Date().toString());
+        logger.info("\uD83E\uDD6C \uD83E\uDD6C RegisterLandFlowResponder call method at " + new Date().toString());
         final ServiceHub serviceHub = getServiceHub();
         Party myself = serviceHub.getMyInfo().getLegalIdentities().get(0);
         Party party = counterPartySession.getCounterparty();
@@ -44,7 +44,7 @@ public class RegisterLandFlowResponder extends FlowLogic<SignedTransaction> {
         subFlow(signTransactionFlow);
         SignedTransaction signedTransaction = subFlow(new ReceiveFinalityFlow(counterPartySession));
         logger.info("🤟 🤟 🤟 ❤️ \uD83E\uDDE1 \uD83D\uDC9B \uD83D\uDC9A \uD83D\uDC99 \uD83D\uDC9C ReceiveFinalityFlow executed \uD83E\uDD1F");
-        logger.info("🤟 🤟 🤟 returning signedTransaction \uD83E\uDD1F \uD83C\uDF4F \uD83C\uDF4E ".concat(signedTransaction.toString()));
+        logger.info("🤟 🤟 🤟 RegisterLandFlowResponder returning signedTransaction \uD83E\uDD1F \uD83C\uDF4F \uD83C\uDF4E ".concat(signedTransaction.toString()));
         return signedTransaction;
 
     }

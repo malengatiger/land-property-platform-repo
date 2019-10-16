@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.lip.webserver.data.LIPAccountDTO;
 import com.lip.webserver.util.DemoUtil;
+import com.lip.webserver.util.FirebaseUtil;
 import com.lip.webserver.util.WorkerBee;
 import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
@@ -120,13 +121,47 @@ public class AdminController {
         logger.info("🥬 🥬 🥬 🥬  getAllStates ...  \uD83E\uDD6C ");
         return WorkerBee.getAllStates(proxy);
     }
+    @GetMapping(value = "/getLandStates", produces = "application/json")
+    private List<LandDTO> getLandStates() throws Exception {
+
+        logger.info("🥬 🥬 🥬 🥬  getLandStates ...  \uD83E\uDD6C ");
+        List<LandDTO> list = WorkerBee.getLandStates(proxy);
+        for (LandDTO m: list) {
+            logger.info("🥬 🥬 🥬 🥬 ".concat(GSON.toJson(m)));
+        }
+        return list;
+    }
     @GetMapping(value = "/demo", produces = "application/json")
-    private String startDemoData() throws Exception {
+    private String startDemoData(@RequestParam boolean recreate) throws Exception {
 
         logger.info("🥬 🥬 🥬 🥬  startDemoData ...  \uD83E\uDD6C ");
-        return DemoUtil.startDemoData(proxy);
+        List<LandDTO> list = FirebaseUtil.getLandParcels();
+        if (list.isEmpty()) {
+            throw new Exception("Generate LandStates first before running demo data");
+        }
+        logger.info("🥬 🥬 🥬 🥬  existing LandStates from Firestore" +
+                " ...  \uD83E\uDD6C " + list.size() + " \uD83D\uDE21 \uD83D\uDE21 ");
+        return DemoUtil.startDemoData(proxy, recreate);
     }
 
+    @GetMapping(value = "/issueDemoTokens", produces = "application/json")
+    private String issueDemoTokens() throws Exception {
+
+        logger.info("🥬 🥬 🥬 🥬  issueTokens ...  \uD83E\uDD6C ");
+        return DemoUtil.distributeTokens(proxy);
+    }
+    @GetMapping(value = "/issueTokens", produces = "application/json")
+    private String issueTokens(
+            @RequestParam long amount,
+            @RequestParam String holderIdentifier,
+            @RequestParam String tokenIdentifier,
+            @RequestParam String landStateIdentifier
+    ) throws Exception {
+
+        logger.info("🥬 🥬 🥬 🥬  issueTokens ...  \uD83E\uDD6C ");
+        return WorkerBee.issueTokens(proxy, amount,
+                holderIdentifier, tokenIdentifier, landStateIdentifier);
+    }
 
     private class PingResult {
         String message;

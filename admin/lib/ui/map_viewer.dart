@@ -72,7 +72,7 @@ class _MapViewerState extends State<MapViewer> {
                 height: 8,
               ),
               Text(
-                getFormattedAmount('${widget.land.originalValue}', context),
+                getFormattedAmount('${widget.land.value}', context),
                 style: Styles.whiteBoldSmall,
               ),
               SizedBox(

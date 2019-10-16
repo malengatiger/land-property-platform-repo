@@ -412,7 +412,7 @@ class _MapEditorState extends State<MapEditor> {
                     height: 20,
                   ),
                   Text(
-                    getFormattedAmount('${widget.land.originalValue}', context),
+                    getFormattedAmount('${widget.land.value}', context),
                     style: Styles.blackBoldMedium,
                   ),
                 ],

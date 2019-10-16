@@ -6,6 +6,7 @@ import com.lip.flows.regulator.ReportToRegulatorFlow;
 import com.lip.flows.tokens.CreateLandTokenTypeFlow;
 import com.lip.states.LandState;
 import com.google.common.collect.ImmutableList;
+import com.r3.corda.lib.tokens.contracts.states.FungibleToken;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.node.ServiceHub;
@@ -20,7 +21,7 @@ import java.util.Set;
 
 @InitiatingFlow
 @StartableByRPC
-public class RegisterLandFlow extends FlowLogic<SignedTransaction> {
+public class RegisterLandFlow extends FlowLogic<FungibleToken> {
     private final static Logger logger = LoggerFactory.getLogger(RegisterLandFlow.class);
 
     final LandState landState;
@@ -66,7 +67,7 @@ public class RegisterLandFlow extends FlowLogic<SignedTransaction> {
 
     @Override
     @Suspendable
-    public SignedTransaction call() throws FlowException {
+    public FungibleToken call() throws FlowException {
         // We retrieve the notary identity from the network map.
         final ServiceHub serviceHub = getServiceHub();
         logger.info(" \uD83E\uDD1F \uD83E\uDD1F  \uD83E\uDD1F \uD83E\uDD1F  ... RegisterLandFlow call started ...");
@@ -123,13 +124,19 @@ public class RegisterLandFlow extends FlowLogic<SignedTransaction> {
                         bnoFlowSession,
                         bankFlowSession),
                 FINALISING_TRANSACTION.childProgressTracker()));
-        logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 FinalityFlow has been executed ... \uD83E\uDD66  are we good? \uD83E\uDD66 ❄️ ❄️ ❄️");
-        logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 returning mSignedTransactionDone:  ❄️ ❄️ : ".concat(mSignedTransactionDone.toString()));
 
-        SignedTransaction tx = subFlow(new CreateLandTokenTypeFlow(
-                landState,"First creation: ".concat(new Date().toString())));
-        reportToRegulator(serviceHub,tx);
-        return tx;
+        logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 FinalityFlow has been executed ... " +
+                "\uD83E\uDD66  are we good? \uD83E\uDD66 ❄️ ❄️ ❄️");
+        logger.info((" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 returning mSignedTransactionDone:  " +
+                "❄️ ❄️ : ").concat(mSignedTransactionDone.toString()));
+
+        //create LandToken type
+        logger.info(" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 creating FungibleToken type ...");
+        FungibleToken fungibleToken = subFlow(new CreateLandTokenTypeFlow(landState,landState.getName(), landState.getValue()));
+        logger.info((" \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 FungibleToken type created: " +
+                "\uD83D\uDE21 txId:")
+        .concat(fungibleToken.toString()));
+        return fungibleToken;
     }
 
     @Suspendable

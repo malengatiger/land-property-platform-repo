@@ -2,6 +2,7 @@ package com.lip.webserver.data;
 
 public class CoordinatesDTO {
     private double latitude, longitude;
+    private String dateTime;
 
     public CoordinatesDTO(double latitude, double longitude) {
         this.latitude = latitude;
@@ -25,5 +26,13 @@ public class CoordinatesDTO {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
     }
 }

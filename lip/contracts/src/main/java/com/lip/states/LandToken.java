@@ -1,26 +1,26 @@
 package com.lip.states;
 
-import com.google.common.collect.ImmutableList;
 import com.lip.contracts.LandTokenContract;
 import com.r3.corda.lib.tokens.contracts.states.EvolvableTokenType;
 import net.corda.core.contracts.BelongsToContract;
-import net.corda.core.contracts.LinearState;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.identity.Party;
+import net.corda.core.serialization.CordaSerializable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @BelongsToContract(LandTokenContract.class)
-public class LandToken extends EvolvableTokenType {
-    final String description;
-    final Party maintainer;
-    final UniqueIdentifier linearId;
-    final LandState landState;
+@CordaSerializable
 
-    public LandToken(String description, Party maintainer, UniqueIdentifier linearId, LandState landState) {
+public class LandToken extends EvolvableTokenType {
+    private final String description;
+    private final UniqueIdentifier linearId;
+    private final LandState landState;
+
+    public LandToken(String description, UniqueIdentifier linearId, LandState landState) {
         this.description = description;
-        this.maintainer = maintainer;
         this.linearId = linearId;
         this.landState = landState;
     }
@@ -33,7 +33,13 @@ public class LandToken extends EvolvableTokenType {
     @NotNull
     @Override
     public List<Party> getMaintainers() {
-        return ImmutableList.of(maintainer);
+        List<Party> parties = new ArrayList<>();
+        parties.add(landState.getBnoParty());
+        parties.add(landState.getRegulatorParty());
+        parties.add(landState.getBankParty());
+        parties.add(landState.getLandAffairsParty());
+
+        return parties;
     }
 
     @NotNull

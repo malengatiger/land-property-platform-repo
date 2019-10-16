@@ -2,8 +2,6 @@ package com.lip.webserver;
 
 import com.lip.webserver.data.CoordinatesDTO;
 import com.lip.webserver.data.X500Name;
-
-import java.util.Date;
 import java.util.List;
 
 public class LandDTO {
@@ -11,15 +9,15 @@ public class LandDTO {
     private X500Name landAffairsParty, bnoParty, regulatorParty, bankParty;
     private List<CoordinatesDTO> polygon;
     private List<String> imageURLs;
-    private Date dateRegistered;
+    private String dateRegistered;
     private String description, identifier;
-    private double value;
+    private long value;
 
     public LandDTO(String name, X500Name landAffairsParty,
                    X500Name bnoParty, X500Name regulatorParty,
                    X500Name bankParty, List<CoordinatesDTO> polygon,
-                   List<String> imageURLs, Date dateRegistered,
-                   String description, String identifier, double value) {
+                   List<String> imageURLs, String dateRegistered,
+                   String description, String identifier, long value) {
         this.name = name;
         this.landAffairsParty = landAffairsParty;
         this.bnoParty = bnoParty;
@@ -31,6 +29,10 @@ public class LandDTO {
         this.description = description;
         this.identifier = identifier;
         this.value = value;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     public String getIdentifier() {
@@ -96,11 +98,11 @@ public class LandDTO {
         this.polygon = polygon;
     }
 
-    public Date getDateRegistered() {
+    public String getDateRegistered() {
         return dateRegistered;
     }
 
-    public void setDateRegistered(Date dateRegistered) {
+    public void setDateRegistered(String dateRegistered) {
         this.dateRegistered = dateRegistered;
     }
 
@@ -112,11 +114,11 @@ public class LandDTO {
         this.description = description;
     }
 
-    public double getValue() {
+    public long getValue() {
         return value;
     }
 
-    public void setValue(double value) {
+    public void setValue(long value) {
         this.value = value;
     }
 }

@@ -88,6 +88,8 @@ public class LIPWebApi {
                     .setDatabaseUrl("https://land-platform.firebaseio.com")
                     .build();
 
+            logger.info("\uD83D\uDE21 \uD83D\uDE21 Firebase project url: \uD83D\uDE21 "
+                    .concat(options.getDatabaseUrl()));
             FirebaseApp app =FirebaseApp.initializeApp(options);
             logger.info(" \uD83E\uDDE9\uD83E\uDDE9\uD83E\uDDE9  \uD83E\uDDE9\uD83E\uDDE9\uD83E\uDDE9 " +
                     "Firebase Admin Setup OK:  \uD83E\uDDE9\uD83E\uDDE9\uD83E\uDDE9 name: "

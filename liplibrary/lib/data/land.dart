@@ -4,14 +4,16 @@ class LandDTO {
   List<String> imageURLs;
   List<CoordinatesDTO> polygon;
   String name;
-  double originalValue;
-  String dateRegistered;
+  int value;
+  String dateRegistered, description, identifier;
 
   LandDTO(
       {this.imageURLs,
       this.polygon,
       this.name,
-      this.originalValue,
+      this.value,
+      this.identifier,
+      this.description,
       this.dateRegistered});
 
   LandDTO.fromJson(Map data) {
@@ -34,7 +36,9 @@ class LandDTO {
       });
     }
     this.name = data['name'];
-    this.originalValue = data['originalValue'];
+    this.description = data['description'];
+    this.identifier = data['identifier'];
+    this.value = data['value'];
     this.dateRegistered = data['dateRegistered'];
   }
 
@@ -42,7 +46,9 @@ class LandDTO {
     var map = Map<String, dynamic>();
 
     map["name"] = name;
-    map["originalValue"] = originalValue;
+    map["identifier"] = identifier;
+    map["description"] = description;
+    map["value"] = value;
     map["dateRegistered"] = dateRegistered;
     map["imageURLs"] = imageURLs;
     var p = List<Map>();

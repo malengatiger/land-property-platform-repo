@@ -101,6 +101,7 @@ sourceSets {
 dependencies {
     testCompile "junit:junit:$junit_version"
     implementation fileTree(dir: 'lib', include: ['*.jar'])
+    implementation files('lib/corda-settler-0.1.jar')
     // For logging.
     testCompile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
     testCompile "org.apache.logging.log4j:log4j-web:${log4j_version}"
@@ -134,6 +135,9 @@ dependencies {
     cordaCompile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
     cordaCompile "org.apache.logging.log4j:log4j-web:${log4j_version}"
     cordaCompile "org.slf4j:jul-to-slf4j:$slf4j_version"
+
+
+    implementation files('lib/corda-settler-0.1.jar')
 
 }
 

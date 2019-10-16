@@ -8,16 +8,20 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.lip.states.LandState;
 import com.lip.states.LandToken;
 import com.lip.webserver.LandDTO;
 import com.lip.webserver.data.LIPAccountDTO;
+import com.lip.webserver.data.LandTokenDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+
+import static com.lip.webserver.data.Constants.LAND_PARCELS;
+import static com.lip.webserver.data.Constants.TOKEN_TYPES;
 
 public class FirebaseUtil {
     private final static Logger logger = LoggerFactory.getLogger(FirebaseUtil.class);
@@ -86,8 +90,9 @@ public class FirebaseUtil {
 //    }
 
     static void addUserToDatabase(LIPAccountDTO account) throws Exception {
+
         ApiFuture<DocumentReference> future = db.collection("accounts")
-                .add(GSON.toJson(account));
+                .add(account);
         DocumentReference reference = future.get();
         logger.info(("\uD83D\uDD11 \uD83D\uDD11 \uD83D\uDD11 " +
                 "Account added to Firestore: ").concat(reference.getPath()));
@@ -122,25 +127,25 @@ public class FirebaseUtil {
         List<QueryDocumentSnapshot> list = snapshot.getDocuments();
         List<LIPAccountDTO> mLipAccounts = new ArrayList<>();
         for (QueryDocumentSnapshot qds: list) {
-            LIPAccountDTO x = GSON.fromJson(qds.getData().toString(),LIPAccountDTO.class);
+            LIPAccountDTO x = qds.toObject(LIPAccountDTO.class);
             mLipAccounts.add(x);
         }
         logger.info("\uD83C\uDF4A \uD83C\uDF4A Firestore found LipAccounts: \uD83D\uDD06 " + mLipAccounts.size() + " \uD83D\uDD06 ");
         return mLipAccounts;
     }
-    static List<LandDTO> getLandParcels() throws ExecutionException, InterruptedException {
-        ApiFuture<QuerySnapshot> future = db.collection("landParcels").get();
+    public static List<LandDTO> getLandParcels() throws ExecutionException, InterruptedException {
+        ApiFuture<QuerySnapshot> future = db.collection(LAND_PARCELS).get();
         QuerySnapshot snapshot = future.get();
         List<QueryDocumentSnapshot> list = snapshot.getDocuments();
         List<LandDTO> landParcels = new ArrayList<>();
         for (QueryDocumentSnapshot qds: list) {
-            LandDTO x = GSON.fromJson(qds.getData().toString(),LandDTO.class);
+            LandDTO x = qds.toObject(LandDTO.class);
             landParcels.add(x);
         }
         logger.info("\uD83E\uDD6C \uD83E\uDD6C Firestore found landParcels: \uD83D\uDD06 " + landParcels.size() + " \uD83D\uDD06 ");
         return landParcels;
     }
-    static LandToken getToken(String identifier) throws Exception {
+    static LandTokenDTO getToken(String identifier) throws Exception {
         ApiFuture<QuerySnapshot> future = db.collection("tokenTypes")
                 .whereEqualTo("identifier",identifier)
                 .get();
@@ -149,17 +154,33 @@ public class FirebaseUtil {
         if (list.isEmpty()) {
             throw new Exception("TokenType not found");
         }
-        LandToken token = GSON.fromJson(list.get(0).getData().toString(),LandToken.class);
+        LandTokenDTO token = list.get(0).toObject(LandTokenDTO.class);
         return token;
     }
-    static void addToken(LandToken token) throws ExecutionException, InterruptedException {
-        ApiFuture<DocumentReference> future = db.collection("tokenTypes").add(token);
+    static LandTokenDTO getTokenByName(String description) throws Exception {
+        ApiFuture<QuerySnapshot> future = db.collection("tokenTypes")
+                .whereEqualTo("description",description)
+                .get();
+        QuerySnapshot snapshot = future.get();
+        List<QueryDocumentSnapshot> list = snapshot.getDocuments();
+        if (list.isEmpty()) {
+            throw new Exception("TokenType not found");
+        }
+        return list.get(0).toObject(LandTokenDTO.class);
+    }
+    static void addToken(LandTokenDTO token) throws ExecutionException, InterruptedException {
+        ApiFuture<DocumentReference> future = db.collection(TOKEN_TYPES).add(token);
         DocumentReference documentReference = future.get();
         logger.info("\uD83C\uDF81 \uD83C\uDF81 TokenType added to Firestore: "
-
         .concat(documentReference.getPath()));
     }
-    public static void deleteUsers() throws FirebaseAuthException {
+    static void addLand(LandDTO land) throws ExecutionException, InterruptedException {
+        ApiFuture<DocumentReference> future = db.collection(LAND_PARCELS).add(land);
+        DocumentReference documentReference = future.get();
+        logger.info("\uD83C\uDF81 \uD83C\uDF81 Land added to Firestore: "
+                .concat(documentReference.getPath()));
+    }
+    static void deleteUsers() throws FirebaseAuthException {
         // Start listing users from the beginning, 1000 at a time.
         ListUsersPage page = FirebaseAuth.getInstance().listUsers(null);
         while (page != null) {
@@ -244,11 +265,10 @@ public class FirebaseUtil {
         }
     }
 
-    private static int BATCH_SIZE = 2000;
-
-    public static void deleteCollection(String collectionName) throws ExecutionException, InterruptedException {
+    static void deleteCollection(String collectionName) throws ExecutionException, InterruptedException {
         // retrieve a small batch of documents to avoid out-of-memory errors
         CollectionReference collection = db.collection(collectionName);
+        int BATCH_SIZE = 2000;
         ApiFuture<QuerySnapshot> future = collection.limit(BATCH_SIZE).get();
         int deleted = 0;
         // future.get() blocks on document retrieval

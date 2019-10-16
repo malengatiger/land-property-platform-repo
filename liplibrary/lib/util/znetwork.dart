@@ -12,7 +12,7 @@ import 'package:liplibrary/util/zprefs.dart';
 class Net {
   static Firestore db = Firestore.instance;
   static FirebaseAuth auth = FirebaseAuth.instance;
-  static const URL = 'http://192.168.86.240:10095/';
+  static const URL = 'http://192.168.86.240:10595/';
   static const Map<String, String> headers = {
     'Content-type': 'application/json',
     'Accept': 'application/json',
@@ -109,11 +109,11 @@ class Net {
     final response = await post(URL + 'land/startLandRegistrationFlow', bag);
     var m = json.decode(response);
     var land = LandDTO.fromJson(m);
-    try {
-      await addLandToFirestore(land);
-    } catch (e) {
-      print(' 🔆🔆🔆🔆 Firestore call failed. we might not be online');
-    }
+//    try {
+//      await addLandToFirestore(land);
+//    } catch (e) {
+//      print(' 🔆🔆🔆🔆 Firestore call failed. we might not be online');
+//    }
     return land;
   }
 

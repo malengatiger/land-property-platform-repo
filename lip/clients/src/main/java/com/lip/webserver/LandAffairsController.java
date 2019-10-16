@@ -76,18 +76,6 @@ public class LandAffairsController {
     @PostMapping(value = "/startLandRegistrationFlow", produces = "application/json")
     private LandDTO startRegisterLandFlow(@RequestBody LandDTO land) throws Exception {
 
-        if (land.getLandAffairsParty() == null) {
-            land.setLandAffairsParty(new X500Name("DeptLandAffairs","Pretoria","ZA"));
-        }
-        if (land.getBnoParty() == null) {
-            land.setBnoParty(new X500Name("LipNetworkOperator","Johannesburg","ZA"));
-        }
-        if (land.getBankParty() == null) {
-            land.setBankParty(new X500Name("Bank","Johannesburg","ZA"));
-        }
-        if (land.getRegulatorParty() == null) {
-            land.setRegulatorParty(new X500Name("Regulator","Johannesburg","ZA"));
-        }
         if (land.getName() == null) {
             land.setName("Land: TempErf: " + System.currentTimeMillis());
         }
@@ -96,7 +84,7 @@ public class LandAffairsController {
         }
         logger.info("\uD83C\uDF4F .... startRegisterLandFlow ........... \uD83C\uDF4F \uD83C\uDF4F \uD83C\uDF4F LAND: " + GSON.toJson(land));
         try {
-            return WorkerBee.addLand(proxy,land);
+            return WorkerBee.addLand(proxy,land, true);
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw e;

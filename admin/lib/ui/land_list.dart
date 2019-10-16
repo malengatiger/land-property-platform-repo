@@ -195,7 +195,7 @@ class _LandListState extends State<LandList> {
                                       ),
                                       Text(
                                         getFormattedAmount(
-                                            '${land.originalValue}', context),
+                                            '${land.value}', context),
                                         style: Styles.blackBoldMedium,
                                       ),
                                     ],
@@ -213,8 +213,7 @@ class _LandListState extends State<LandList> {
                                         ),
                                       ),
                                       Text(
-                                        getFormattedDateShortWithTime(
-                                            land.dateRegistered, context),
+                                        land.dateRegistered,
                                         style: Styles.blueSmall,
                                       ),
                                     ],

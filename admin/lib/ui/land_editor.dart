@@ -134,7 +134,7 @@ class _LandEditorState extends State<LandEditor> {
       print("🍎 🍊 ready to rumble $name ");
       LandDTO m = LandDTO(
         name: name,
-        originalValue: double.parse(originalValue),
+        value: int.parse(originalValue),
         polygon: List(),
         imageURLs: List(),
       );

@@ -7,8 +7,8 @@ import net.corda.core.contracts.ContractState;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
 import net.corda.core.serialization.CordaSerializable;
+import org.jetbrains.annotations.NotNull;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 // *********
@@ -24,12 +24,12 @@ public class LandState implements ContractState {
     private final List<String> imageURLs;
     private final Date dateRegistered;
     private final String description;
-    private final BigDecimal value;
+    private final long value;
     private final UUID identifier;
 
     public LandState(String name, Party landAffairsParty, Party bnoParty,
                      Party regulatorParty, Party bankParty, List<Coordinates> polygon, List<String> imageURLs,
-                     Date dateRegistered, String description, BigDecimal value, UUID identifier) {
+                     Date dateRegistered, String description, long value, UUID identifier) {
         this.name = name;
         this.landAffairsParty = landAffairsParty;
         this.bnoParty = bnoParty;
@@ -43,6 +43,7 @@ public class LandState implements ContractState {
         this.identifier = identifier;
     }
 
+    @NotNull
     @Override
     public List<AbstractParty> getParticipants() {
        return ImmutableList.of(bnoParty,landAffairsParty,regulatorParty, bankParty);
@@ -88,7 +89,7 @@ public class LandState implements ContractState {
         return description;
     }
 
-    public BigDecimal getValue() {
+    public long getValue() {
         return value;
     }
 
