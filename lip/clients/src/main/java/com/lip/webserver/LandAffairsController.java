@@ -2,6 +2,7 @@ package com.lip.webserver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.lip.webserver.data.LandDTO;
 import com.lip.webserver.data.X500Name;
 import com.lip.webserver.util.PingResult;
 import com.lip.webserver.util.WorkerBee;
@@ -82,6 +83,9 @@ public class LandAffairsController {
         if (land.getPolygon() == null || land.getPolygon().isEmpty() || land.getPolygon().size() < 3) {
             throw new Exception("invalid polygon");
         }
+        if (land.getAreaInSquareMetres() == 0) {
+            throw new Exception("Area is zero");
+        }
         logger.info("\uD83C\uDF4F .... startRegisterLandFlow ........... \uD83C\uDF4F \uD83C\uDF4F \uD83C\uDF4F LAND: " + GSON.toJson(land));
         try {
             return WorkerBee.addLand(proxy,land, true);
@@ -91,5 +95,22 @@ public class LandAffairsController {
         }
     }
 
+
+    @PostMapping(value = "/startTokenDistributionFlow", produces = "application/json")
+    private String startTokenDistributionFlow(@RequestParam String tokenId,
+                                              @RequestParam String ownerId,
+                                              @RequestParam long amount) throws Exception {
+
+        logger.info("\uD83C\uDF4F .... starTokenDistributionFlow " +
+                "........... \uD83C\uDF4F \uD83C\uDF4F \uD83C\uDF4F tokenId: "
+                .concat(tokenId).concat(" ownerId: ").concat(ownerId)
+                .concat(" ").concat(" amount: " + amount));
+        try {
+            return WorkerBee.distributeTokens(proxy,amount,tokenId,ownerId);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new Exception("Distribution failed",e);
+        }
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.lip.webserver.util;
 
 import com.google.cloud.firestore.Firestore;
+import com.google.common.collect.ImmutableList;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
@@ -15,17 +16,14 @@ import com.lip.states.Coordinates;
 import com.lip.states.LIPAccountState;
 import com.lip.states.LandState;
 import com.lip.states.LandToken;
-import com.lip.webserver.LandDTO;
-import com.lip.webserver.data.CoordinatesDTO;
-import com.lip.webserver.data.LIPAccountDTO;
-import com.lip.webserver.data.LandTokenDTO;
-import com.lip.webserver.data.X500Name;
+import com.lip.webserver.data.*;
 import com.r3.corda.lib.accounts.contracts.states.AccountInfo;
 import com.r3.corda.lib.tokens.contracts.states.FungibleToken;
 import net.corda.core.concurrent.CordaFuture;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.contracts.UniqueIdentifier;
+import net.corda.core.flows.FlowException;
 import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.node.NodeInfo;
@@ -76,6 +74,9 @@ public class WorkerBee {
             if (land.getValue() == 0) {
                 throw new Exception("Amount cannot be zero");
             }
+            if (land.getAreaInSquareMetres() == 0) {
+                throw new Exception("AreaInSquareMetres cannot be zero");
+            }
             Party landAffairsParty = getParty(LAND_AFFAIRS);
             Party regulatorParty = getParty(REGULATOR);
             Party bnoParty = getParty(BNO);
@@ -100,7 +101,7 @@ public class WorkerBee {
             }
             LandState state = new LandState(land.getName(), landAffairsParty, bnoParty,
                     regulatorParty, bankParty, coords, land.getImageURLs(), new Date(), land.getDescription(),
-                    land.getValue(), uuid);
+                    land.getValue(), land.getAreaInSquareMetres(), uuid);
 
             CordaFuture<FungibleToken> cordaFuture = proxy.startTrackedFlowDynamic(
                     RegisterLandFlow.class, state).getReturnValue();
@@ -293,15 +294,17 @@ public class WorkerBee {
 
         for (StateAndRef<ContractState> ref : page.getStates()) {
             if (ref.getState().getData() instanceof FungibleToken) {
-                FungibleToken token = (FungibleToken)ref.getState().getData();
+                FungibleToken token = (FungibleToken) ref.getState().getData();
                 list.add(token.toString());
                 logger.info(("\uD83E\uDD1F \uD83E\uDD1F \uD83E\uDD1F \uD83E\uDD1F " +
                         "FungibleToken: ").concat(token.toString()));
+                logger.info("\uD83D\uDD06 TokenIdentifier: ".concat(token.getIssuedTokenType().getTokenIdentifier()));
+                logger.info("\uD83D\uDD06 Token Amount: ".concat(String.valueOf(token.getAmount())));
             }
             if (ref.getState().getData() instanceof AccountInfo) {
-                AccountInfo info = (AccountInfo)ref.getState().getData();
-                String s1 = "\uD83C\uDF4F \uD83C\uDF4F \uD83C\uDF4F Account Info: " + info.getName().concat(" ")
-                .concat(info.getIdentifier().getId().toString());
+                AccountInfo info = (AccountInfo) ref.getState().getData();
+                String s1 = "\uD83C\uDF4F \uD83C\uDF4F \uD83C\uDF4F Account Info: " + info.getName().concat(" \uD83C\uDF4E ")
+                        .concat(info.getIdentifier().getId().toString());
                 list.add(s1);
                 logger.info(s1);
             }
@@ -309,27 +312,33 @@ public class WorkerBee {
                 LIPAccountState info = (LIPAccountState) ref.getState().getData();
                 String s1 = "\uD83D\uDC7D \uD83D\uDC7D \uD83D\uDC7D LIPAccount: " + info.getName().concat(" \uD83D\uDCA0 ")
                         .concat(info.getCellphone())
-                .concat(" \uD83D\uDCA0 ").concat(info.getEmail());
+                        .concat(" \uD83D\uDCA0 ").concat(info.getEmail());
+                String keys = "\uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35 PartyAndCertificate name: ".concat(info.getPartyAndCertificate().getName().toString()
+                        .concat("   \uD83D\uDD35 PartyAndCertificate Key: ").concat(info.getPartyAndCertificate().getParty().getOwningKey().getEncoded().toString()
+                                .concat("  \uD83D\uDC7D accountInfo Key: ").concat(info.getAccountInfo().getParticipants().get(0).getOwningKey().getEncoded().toString())));
                 list.add(s1);
                 logger.info(s1);
+                logger.info(keys);
             }
             if (ref.getState().getData() instanceof LandState) {
-                LandState info = (LandState)ref.getState().getData();
+                LandState info = (LandState) ref.getState().getData();
                 String s1 = "\uD83C\uDF3A \uD83C\uDF3A  \uD83C\uDF3A \uD83C\uDF3A Land Parcel Name: "
                         + info.getName().concat(" ")
                         .concat(" polygon points: " + info.getPolygon().size())
-                .concat(" value:  \uD83C\uDF4E ").concat("" + info.getValue() + "  \uD83C\uDF4E ");
+                        .concat(" value:  \uD83C\uDF4E ").concat("" + info.getValue() + "  \uD83C\uDF4E "
+                                .concat(" AreaInSquareMetres: " + info.getAreaInSquareMetres()));
                 list.add(s1);
                 logger.info(s1);
             }
             if (ref.getState().getData() instanceof LandToken) {
-                LandToken info = (LandToken)ref.getState().getData();
+                LandToken landToken = (LandToken) ref.getState().getData();
                 String s1 = "\uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 Land Token Type: "
-                        + info.getDescription().concat(" ")
-                        .concat(" :  \uD83C\uDF4E ").concat(" LandState: " + info.getLandState().getName()
+                        + landToken.getDescription().concat(" ")
+                        .concat(" :  \uD83C\uDF4E ").concat(" LandState: " + landToken.getLandState().getName()
                                 + "  \uD83C\uDF4E ");
                 list.add(s1);
                 logger.info(s1);
+                logger.info(landToken.toString());
             }
 
         }
@@ -355,6 +364,65 @@ public class WorkerBee {
         }
         logger.info(" \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35 LIPAccounts found: " + list.size());
         return list;
+    }
+
+    public static String distributeTokens(CordaRPCOps proxy,
+                                          long amount,
+                                          String tokenIdentifier,
+                                          String holderIdentifier) throws Exception {
+        //get token
+        UUID uuid = UUID.fromString(tokenIdentifier);
+        //construct the query criteria
+        QueryCriteria queryCriteria = new QueryCriteria.LinearStateQueryCriteria(
+                null, ImmutableList.of(uuid), null,
+                Vault.StateStatus.UNCONSUMED);
+        // grab the token type off the ledger which was created using CreateEvolvableTokens flow
+        Vault.Page<LandToken> page = proxy.vaultQueryByCriteria(queryCriteria,LandToken.class);
+        if (page.getStates().isEmpty()) {
+            throw new IllegalStateException("\uD83D\uDC7F LandToken type not found on DLT");
+        } else {
+            logger.info(" \uD83D\uDC7D \uD83D\uDC7D  We cool with LandToken !  \uD83D\uDC7D \uD83D\uDC7D ");
+        }
+        LandToken landToken = page.getStates().get(0).getState().getData();
+        logger.info("\n\n\uD83C\uDF4F \uD83C\uDF4F \uD83C\uDF4F LandToken type to be distributed: \n"
+                .concat(landToken.toString())
+                .concat("\uD83D\uDD06 LinearId: ").concat(landToken.getLinearId().getId().toString()));
+
+        //get lipAccountState
+        QueryCriteria criteriaB = new QueryCriteria.VaultQueryCriteria(Vault.StateStatus.UNCONSUMED);
+        Vault.Page<LIPAccountState> page2 = proxy.vaultQueryByCriteria(criteriaB, LIPAccountState.class);
+        LIPAccountState lipAccountState = null;
+        for (StateAndRef<LIPAccountState> s : page2.getStates()) {
+            String id = s.getState().getData().getAccountInfo().getIdentifier().getId().toString();
+            if (id.equalsIgnoreCase(holderIdentifier)) {
+                lipAccountState = s.getState().getData();
+            }
+        }
+        if (lipAccountState == null) {
+            throw new Exception("\uD83D\uDC7F LIPAccountState not found");
+        }
+        if (lipAccountState.getPartyAndCertificate() == null) {
+            throw new Exception("\uD83D\uDC7F LIPAccountState is missing PartyAndCertificate");
+        }
+        logger.info("\n\n\uD83C\uDF4E  \uD83C\uDF4E lipAccountState: \n"
+                .concat(lipAccountState.toString())
+        .concat("  \uD83D\uDDF3 \uD83D\uDDF3 \uD83D\uDDF3 \n\uD83C\uDF4E  \uD83C\uDF4E " +
+                "\n .... Start DistributeLandTokenFlow ...."));
+
+        CordaFuture<SignedTransaction> signedTransactionCordaFuture = proxy.startFlowDynamic(
+                DistributeLandTokenFlow.class,
+                tokenIdentifier, amount, lipAccountState)
+                .getReturnValue();
+
+        SignedTransaction issueTx = signedTransactionCordaFuture.get();
+        logger.info("\uD83D\uDC7D \uD83D\uDC7D \uD83D\uDC7D \uD83D\uDC7D \uD83D\uDC7D \uD83D\uDC4C " +
+                "YEBO!! \uD83D\uDC4C signedTransaction returned: \uD83C\uDF4F \uD83C\uDF4E "
+                + issueTx.getId().toString() + " \uD83C\uDF4F \uD83C\uDF4E"
+                + " tokens distributed: " + amount);
+        String result =
+                "\uD83C\uDF3F \uD83C\uDF3F  distributeTokens completed OK";
+        logger.info(result);
+        return result;
     }
 
     public static String issueTokens(CordaRPCOps proxy,
@@ -435,6 +503,7 @@ public class WorkerBee {
         m.setValue(s.getValue());
         m.setDescription(s.getDescription());
         m.setImageURLs(s.getImageURLs());
+        m.setAreaInSquareMetres(s.getAreaInSquareMetres());
         m.setDateRegistered(s.getDateRegistered().toString());
         m.setIdentifier(s.getIdentifier().toString());
         m.setBankParty(new X500Name(

@@ -31,7 +31,10 @@ dependencies:
   path: ^1.6.4
   video_player: ^0.10.2+1
   cached_network_image: ^1.1.1
+  area: ^1.0.0
   image:
+
+
 
 dev_dependencies:
   flutter_test:

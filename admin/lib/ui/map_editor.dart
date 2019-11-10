@@ -332,6 +332,7 @@ class _MapEditorState extends State<MapEditor> {
         strokeColor: Colors.yellow,
         fillColor: Colors.transparent);
     polygons.add(pol);
+    widget.land.areaInSquareMetres = calculatePolygonArea(widget.land.polygon);
     setState(() {});
   }
 
@@ -455,7 +456,12 @@ class _MapEditorState extends State<MapEditor> {
         textColor: Colors.lime,
         backgroundColor: Colors.brown);
     try {
-      print('❤️ Submitting land parcel ....');
+      print(
+          '❤️ Submitting land parcel .... area: ${widget.land.areaInSquareMetres}');
+      if (widget.land.areaInSquareMetres == 0) {
+        widget.land.areaInSquareMetres =
+            calculatePolygonArea(widget.land.polygon);
+      }
       LandDTO result = await Net.startLandRegistrationFlow(widget.land);
       print('🧡 💛 💚 💙 💜 ${result.toJson()}');
       _key.currentState.removeCurrentSnackBar();
@@ -483,6 +489,7 @@ class _MapEditorState extends State<MapEditor> {
     _onMapLongPressed(latLng);
   }
 
+  int polygonArea;
   LatLng computeCentroid() {
     double latitude = 0;
     double longitude = 0;

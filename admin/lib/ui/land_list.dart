@@ -75,8 +75,15 @@ class _LandListState extends State<LandList> {
     if (lands.isEmpty) {
       lands = await Net.getLandList();
     }
-
+    lands.sort((a, b) => a.name.compareTo(b.name));
     setState(() {});
+  }
+
+  _fix() async {
+    lands = await Net.getLandList();
+    for (var m in lands) {
+      await Net.addLandToFirestore(m);
+    }
   }
 
   _startLandEditor({LandDTO land}) {
@@ -146,11 +153,13 @@ class _LandListState extends State<LandList> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               lands = snapshot.data;
+              lands.sort((a, b) => a.name.compareTo(b.name));
             }
             return ListView.builder(
                 itemCount: lands.length,
                 itemBuilder: (context, index) {
                   var land = lands.elementAt(index);
+                  var hectare = (land.areaInSquareMetres / 10000).toInt();
                   return Stack(
                     children: <Widget>[
                       GestureDetector(
@@ -189,7 +198,7 @@ class _LandListState extends State<LandList> {
                                       Container(
                                         width: 80,
                                         child: Text(
-                                          'Original Value',
+                                          'Total Tokens',
                                           style: Styles.greyLabelSmall,
                                         ),
                                       ),
@@ -216,6 +225,28 @@ class _LandListState extends State<LandList> {
                                         land.dateRegistered,
                                         style: Styles.blueSmall,
                                       ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 8,
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Container(
+                                        width: 80,
+                                        child: Text(
+                                          'Area',
+                                          style: Styles.greyLabelSmall,
+                                        ),
+                                      ),
+                                      Text(
+                                        getFormattedNumber(hectare, context),
+                                        style: Styles.pinkBoldMedium,
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      Text('hectare')
                                     ],
                                   ),
                                   SizedBox(

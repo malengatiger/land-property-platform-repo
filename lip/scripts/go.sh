@@ -7,7 +7,7 @@ echo -------- ️ "🍀 🍀 🍀 🍀 🍀 🍀 🍀 " done deploying Corda nod
 # ------------ NOTARY NODE
 echo 🕗  Sleeping for 10 seconds
 sleep 10s # Waits 10 seconds.
-echo \nWoke up, opening terminal for Notary Corda Node
+echo \nWoke up, opening terminal for  🍎 Notary Corda Node
 ttab ./scripts/nnotary.sh
 
 # ------------ REGULATOR NODE
@@ -50,7 +50,7 @@ echo \n🔆 Woke up, 🧩 🧩 🧩 🧩 opening Regulator webserver
 ttab ./scripts/wregulator.sh
 sleep 10s
 
-echo \n🔆 Woke up, 🧩 🧩 🧩 🧩  opening BNO webserver
+echo \n🔆 Woke up, 🧩 🧩 🧩 🧩  opening LIP Network Operator webserver
 ttab ./scripts/wbno.sh
 sleep 10s
 
@@ -58,7 +58,7 @@ echo \n🔆 Woke up, 🧩 🧩 🧩 🧩  opening LandAffairs webserver
 ttab ./scripts/wland-affairs.sh
 
 sleep 10s
-echo \n🔆 Woke up, 🧩 🧩 🧩 🧩  opening bank webserver
+echo \n🔆 Woke up, 🧩 🧩 🧩 🧩  opening Bank webserver
 ttab ./scripts/wbank.sh
 
 echo -------- ️ "🍀 🍀 🍀 🍀 🍀 🍀 🍀 " done deploying Corda nodes and associated webservers

@@ -111,13 +111,37 @@ class _MapViewerState extends State<MapViewer> {
                       _drawPolygon();
                     }
                   }),
+          polygonTapped
+              ? Positioned(
+                  left: 10,
+                  top: 10,
+                  child: Card(
+                    elevation: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: <Widget>[
+                          Text('Area'),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            '${getFormattedNumber(polygonArea, context)} m² ',
+                            style: Styles.pinkBoldSmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              : Container(),
         ],
       ),
     );
   }
 
   LatLng latLng;
-
+  bool polygonTapped = false;
   Set<Polygon> polygons = Set();
 
   _drawPolygon() {
@@ -137,8 +161,12 @@ class _MapViewerState extends State<MapViewer> {
         points: points,
         geodesic: true,
         strokeColor: Colors.yellow,
+        consumeTapEvents: true,
+        onTap: _polygonTapped,
         fillColor: Colors.transparent);
+
     polygons.add(pol);
+
     latLng = _computeCentroid();
     _animate();
     setState(() {});
@@ -169,4 +197,18 @@ class _MapViewerState extends State<MapViewer> {
 
     return new LatLng(latitude / n, longitude / n);
   }
+
+  void _polygonTapped() {
+    print('🏮 🏮 on Polygon tapped');
+
+    polygonArea = calculatePolygonArea(widget.land.polygon);
+    print(polygonArea);
+    print(
+        "🍏 🍏 🍏 The polygon area is: 🏮 ${getFormattedNumber(polygonArea, context)} m² 🏮 ");
+    setState(() {
+      polygonTapped = !polygonTapped;
+    });
+  }
 }
+
+int polygonArea = 0;

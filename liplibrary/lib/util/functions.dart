@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:area/area.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:liplibrary/data/coords.dart';
 
 List<String> logs = List();
 bool isBusy = false;
@@ -419,6 +420,25 @@ class Styles {
   static Color blue = Colors.blue;
 }
 
+int calculatePolygonArea(List<CoordinatesDTO> polygon) {
+  print('🏮 🏮 _calculatePolygonArea ...');
+
+  List<List<double>> points = List();
+  polygon.forEach((p) {
+    points.add(Point([p.latitude, p.longitude]).coordinates);
+  });
+  print(points);
+  var world2 = {
+    'type': 'Polygon',
+    'coordinates': [points]
+  };
+
+  double pArea = area(world2);
+  int polygonArea = pArea.toInt();
+  print("🍏 🍏 🍏 The polygon area is: 🏮 $polygonArea m² 🏮 ");
+  return polygonArea;
+}
+
 prettyPrint(Map map, String name) {
   print('$name \t{\n');
   if (map != null) {
@@ -453,7 +473,6 @@ String getFormattedDateLongWithTime(String date, BuildContext context) {
 String getFormattedDateShortWithTime(String date, BuildContext context) {
   Locale myLocale = Localizations.localeOf(context);
 
-  
   var format = new DateFormat('dd MMMM yyyy HH:mm:ss', myLocale.toString());
   try {
     if (date.contains('GMT')) {
@@ -473,7 +492,6 @@ String getFormattedDateLong(String date, BuildContext context) {
 //  print('\getFormattedDateLong $date'); //Sun, 28 Oct 2018 23:59:49 GMT
   Locale myLocale = Localizations.localeOf(context);
 
-  
   var format = new DateFormat('EEEE, dd MMMM yyyy', myLocale.toString());
   try {
     if (date.contains('GMT')) {
@@ -494,7 +512,6 @@ String getFormattedDateLong(String date, BuildContext context) {
 String getFormattedDateShort(String date, BuildContext context) {
   Locale myLocale = Localizations.localeOf(context);
 
-  
   var format = new DateFormat('dd MMMM yyyy', myLocale.toString());
   try {
     if (date.contains('GMT')) {
@@ -515,7 +532,6 @@ String getFormattedDateShort(String date, BuildContext context) {
 String getFormattedDateShortest(String date, BuildContext context) {
   Locale myLocale = Localizations.localeOf(context);
 
-  
   var format = new DateFormat('dd-MM-yyyy', myLocale.toString());
   try {
     if (date.contains('GMT')) {
@@ -536,7 +552,7 @@ String getFormattedDateShortest(String date, BuildContext context) {
 int getIntDate(String date, BuildContext context) {
   print('\n---------------> getIntDate $date'); //Sun, 28 Oct 2018 23:59:49 GMT
   assert(context != null);
-  
+
   try {
     if (date.contains('GMT')) {
       var mDate = getLocalDateFromGMT(date, context);
@@ -552,8 +568,6 @@ int getIntDate(String date, BuildContext context) {
 }
 
 String getFormattedDateHourMinute({DateTime date, BuildContext context}) {
-  
-
   try {
     if (context == null) {
       var dateFormat = DateFormat('HH:mm');
@@ -574,7 +588,7 @@ DateTime getLocalDateFromGMT(String date, BuildContext context) {
   Locale myLocale = Localizations.localeOf(context);
 
   //print('+++++++++++++++ locale: ${myLocale.toString()}');
-  
+
   try {
     var mDate = translateGMTString(date);
     return mDate.toLocal();
@@ -630,13 +644,11 @@ int getMonth(String mth) {
 }
 
 String getUTCDate() {
-  
   String now = new DateTime.now().toUtc().toIso8601String();
   return now;
 }
 
 String getUTC(DateTime date) {
-  
   String now = date.toUtc().toIso8601String();
   return now;
 }
@@ -718,4 +730,10 @@ bool get isInDebugMode {
   bool inDebugMode = false;
   assert(inDebugMode = true);
   return inDebugMode;
+}
+
+class Point {
+  List<double> _coords;
+  Point(this._coords);
+  List<double> get coordinates => _coords;
 }

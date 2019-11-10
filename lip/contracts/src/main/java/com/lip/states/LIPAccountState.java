@@ -87,4 +87,17 @@ public class LIPAccountState implements ContractState {
     public String getIdentifier() {
         return identifier;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder x = new StringBuilder();
+        x.append(" \n\uD83D\uDD35 name: ").append(name);
+        x.append(" \n\uD83D\uDD35 email: ").append(email);
+        x.append(" \n\uD83D\uDD35 host: ").append(accountInfo.getHost());
+        x.append(" \n\uD83D\uDD35 identifier: ").append(identifier);
+        x.append(" \n\uD83D\uDD35 acctInfo identifier: ").append(accountInfo.getIdentifier().getId().toString());
+        x.append(" \n\uD83D\uDD35 partyAndCertificate: ").append(partyAndCertificate.getParty().toString());
+
+        return x.toString();
+    }
 }

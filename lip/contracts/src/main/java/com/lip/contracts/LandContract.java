@@ -50,6 +50,9 @@ public class LandContract implements Contract {
         if (landState.getName() == null) {
             throw new IllegalArgumentException("Land name is required");
         }
+        if (landState.getAreaInSquareMetres() == 0) {
+            throw new IllegalArgumentException("areaInSquareMetres is required");
+        }
         if (landState.getPolygon().size() < 3) {
             throw new IllegalArgumentException("Polygon requires at least 3 coordinates");
         }

@@ -35,13 +35,13 @@ public class LIPWebApi {
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(LIPWebApi.class);
 
     public static void main(String[] args) {
-        logger.info(" \uD83D\uDD06  \uD83D\uDD06 LIPWebApi starting   \uD83D\uDD06  \uD83D\uDD06  \uD83D\uDD06  \uD83D\uDD06️");
+        logger.info(" \uD83D\uDD06  \uD83D\uDD06  \uD83C\uDF4E LIPWebApi starting  \uD83C\uDF4E  \uD83D\uDD06  \uD83D\uDD06  \uD83D\uDD06  \uD83D\uDD06️");
         SpringApplication app = new SpringApplication(LIPWebApi.class);
         app.setBannerMode(Banner.Mode.OFF);
         app.setWebApplicationType(SERVLET);
         app.run(args);
 
-        logger.info(" \uD83D\uDD06  \uD83D\uDD06  \uD83D\uDD06  LIPWebApi:  started ....  ❤️ \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 " +
+        logger.info(" \uD83D\uDD06  \uD83D\uDD06  \uD83D\uDD06   \uD83C\uDF4E LIPWebApi:  started ....  ❤️ \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 \uD83D\uDD06 " +
                 new Date().toString() + " \uD83E\uDDE1 \uD83D\uDC9B \uD83D\uDC9A");
     }
 

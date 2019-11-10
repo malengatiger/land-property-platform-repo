@@ -1,8 +1,8 @@
 package com.lip.contracts;
 
-import com.lip.states.LandState;
 import com.lip.states.LandToken;
 import com.r3.corda.lib.tokens.contracts.EvolvableTokenContract;
+import com.r3.corda.lib.tokens.contracts.commands.EvolvableTokenTypeCommand;
 import net.corda.core.contracts.CommandData;
 import net.corda.core.contracts.Contract;
 import net.corda.core.contracts.ContractState;
@@ -38,8 +38,10 @@ public class LandTokenContract extends EvolvableTokenContract implements Contrac
 
     @Override
     public void additionalUpdateChecks(@NotNull LedgerTransaction tx) {
-        logger.info("additionalUpdateChecks starting ...");
+        logger.info(" \uD83C\uDF4E  \uD83C\uDF4E additionalUpdateChecks starting ...  \uD83C\uDF4E What happens here ???????");
+        //todo - check input and output states
     }
     public static class Register implements CommandData {}
+    public static class Distribute implements EvolvableTokenTypeCommand {}
 }
 

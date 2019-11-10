@@ -55,4 +55,14 @@ public class LandToken extends EvolvableTokenType {
     public LandState getLandState() {
         return landState;
     }
+    @Override
+    public String toString() {
+        StringBuilder x = new StringBuilder();
+        x.append(" \n\uD83D\uDD35 LandState: ").append(landState.getName());
+        x.append(" \n\uD83D\uDD35 Tokens: ").append(landState.getValue());
+        x.append(" \n\uD83D\uDD35 linearId: ").append(linearId.getId().toString());
+        x.append(" \n\uD83D\uDD35 description: ").append(description);
+
+        return x.toString();
+    }
 }

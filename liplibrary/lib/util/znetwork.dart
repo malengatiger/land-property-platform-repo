@@ -105,15 +105,11 @@ class Net {
     var bag = landDTO.toJson();
 
     debugPrint(
-        '🍊 🍊 🍊 🍊 🍊 startLandRegistrationFlow starting the call ...');
+        '🍊 🍊 🍊 🍊 🍊 startLandRegistrationFlow starting the call ...bag: $bag');
     final response = await post(URL + 'land/startLandRegistrationFlow', bag);
     var m = json.decode(response);
     var land = LandDTO.fromJson(m);
-//    try {
-//      await addLandToFirestore(land);
-//    } catch (e) {
-//      print(' 🔆🔆🔆🔆 Firestore call failed. we might not be online');
-//    }
+
     return land;
   }
 

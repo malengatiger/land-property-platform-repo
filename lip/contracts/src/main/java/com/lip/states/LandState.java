@@ -25,11 +25,10 @@ public class LandState implements ContractState {
     private final Date dateRegistered;
     private final String description;
     private final long value;
+    private final long areaInSquareMetres;
     private final UUID identifier;
 
-    public LandState(String name, Party landAffairsParty, Party bnoParty,
-                     Party regulatorParty, Party bankParty, List<Coordinates> polygon, List<String> imageURLs,
-                     Date dateRegistered, String description, long value, UUID identifier) {
+    public LandState(String name, Party landAffairsParty, Party bnoParty, Party regulatorParty, Party bankParty, List<Coordinates> polygon, List<String> imageURLs, Date dateRegistered, String description, long value, long areaInSquareMetres, UUID identifier) {
         this.name = name;
         this.landAffairsParty = landAffairsParty;
         this.bnoParty = bnoParty;
@@ -40,6 +39,7 @@ public class LandState implements ContractState {
         this.dateRegistered = dateRegistered;
         this.description = description;
         this.value = value;
+        this.areaInSquareMetres = areaInSquareMetres;
         this.identifier = identifier;
     }
 
@@ -47,6 +47,10 @@ public class LandState implements ContractState {
     @Override
     public List<AbstractParty> getParticipants() {
        return ImmutableList.of(bnoParty,landAffairsParty,regulatorParty, bankParty);
+    }
+
+    public long getAreaInSquareMetres() {
+        return areaInSquareMetres;
     }
 
     public void addImageURL(String url) {

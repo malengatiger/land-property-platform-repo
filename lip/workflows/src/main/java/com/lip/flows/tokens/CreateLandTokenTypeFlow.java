@@ -2,10 +2,6 @@ package com.lip.flows.tokens;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.google.common.collect.ImmutableList;
-import com.lip.contracts.LandContract;
-import com.lip.contracts.LandTokenContract;
-import com.lip.flows.land.RegisterLandFlow;
-import com.lip.flows.regulator.ReportToRegulatorFlow;
 import com.lip.states.LandState;
 import com.lip.states.LandToken;
 import com.r3.corda.lib.tokens.contracts.states.FungibleToken;
@@ -14,25 +10,27 @@ import com.r3.corda.lib.tokens.contracts.types.TokenPointer;
 import com.r3.corda.lib.tokens.contracts.utilities.TransactionUtilitiesKt;
 import com.r3.corda.lib.tokens.workflows.flows.rpc.CreateEvolvableTokens;
 import com.r3.corda.lib.tokens.workflows.flows.rpc.IssueTokens;
-import net.corda.core.contracts.*;
-import net.corda.core.flows.*;
+import net.corda.core.contracts.Amount;
+import net.corda.core.contracts.TransactionState;
+import net.corda.core.contracts.UniqueIdentifier;
+import net.corda.core.flows.FlowException;
+import net.corda.core.flows.FlowLogic;
+import net.corda.core.flows.InitiatingFlow;
+import net.corda.core.flows.StartableByRPC;
 import net.corda.core.identity.Party;
 import net.corda.core.node.NodeInfo;
-import net.corda.core.node.ServiceHub;
 import net.corda.core.transactions.SignedTransaction;
-import net.corda.core.transactions.TransactionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @InitiatingFlow
 @StartableByRPC
 public class CreateLandTokenTypeFlow extends FlowLogic<FungibleToken> {
-    private final static Logger logger = LoggerFactory.getLogger(RegisterLandFlow.class);
+    private final static Logger logger = LoggerFactory.getLogger(CreateLandTokenTypeFlow.class);
     final LandState landState;
     final String description;
     final long numberOfTokens;
@@ -77,17 +75,19 @@ public class CreateLandTokenTypeFlow extends FlowLogic<FungibleToken> {
         IssuedTokenType issuedTokenType = new IssuedTokenType(getOurIdentity(), tokenPointer);
         FungibleToken fungibleToken = new FungibleToken(
                 new Amount<>(numberOfTokens, issuedTokenType),
-                getOurIdentity(), TransactionUtilitiesKt.getAttachmentIdForGenericParam(tokenPointer));
+                getOurIdentity(),
+                TransactionUtilitiesKt.getAttachmentIdForGenericParam(tokenPointer));
 
-        logger.info((" \uD83D\uDC7D \uD83D\uDC7D \uD83D\uDC7D \uDD35 \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35" +
+        logger.info((" \uD83D\uDC7D \uD83D\uDC7D \uD83D\uDC7D \uD83D\uDD35 \uD83D\uDD35 \uD83D\uDD35" +
                 " fungibleToken.getIssuedTokenType().getTokenIdentifier(): ")
                 .concat(fungibleToken.getIssuedTokenType().getTokenIdentifier()));
-        logger.info("\uD83D\uDC9B \uD83D\uDC9A \uD83D\uDC99 IssueTokens for FungibleToken starting with "
+        logger.info("\uD83D\uDC9B \uD83D\uDC9A \uD83D\uDC99 IssueTokens for FungibleToken: "
+                .concat(fungibleToken.toString()).concat(" with ")
                 + parties.size() + " observers");
 
         SignedTransaction tx2 = subFlow(new IssueTokens(ImmutableList.of(fungibleToken),parties));
 
-        logger.info("\uD83D\uDC9B \uD83D\uDC9A \uD83D\uDC99 CreateLandTokenTypeFlow executed OK; txId: "
+        logger.info("\uD83D\uDC9B \uD83D\uDC9A \uD83D\uDC99 IssueTokens executed OK; txId: "
                 .concat(tx2.getId().toString()).concat("  \uD83C\uDF4E "));
 
         return fungibleToken;
